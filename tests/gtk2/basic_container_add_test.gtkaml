@@ -1,0 +1,18 @@
+<VBox xmlns:g="http://gtkaml.org/0.2" xmlns="Gtk" g:name="MyVBox">  
+      <Label label="_Hello" with-mnemonic="true" expand="false" fill="{1==0}" padding="{0}" />
+      <HPaned>
+          <Entry text="ok" g:public='entry' changed='{GLib.debug("text changed");}' />
+          <Label g:private="label" label="World" add2="true"/>
+      </HPaned>
+<![CDATA[
+	public static int main (string[] argv) {
+		Gtk.init (ref argv);
+		var w = new Gtk.Window ();
+		w.add (new MyVBox());
+		w.show_all ();
+		Gtk.main ();
+		return 0;
+	}
+]]>
+</VBox>
+

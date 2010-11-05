@@ -1,0 +1,58 @@
+CST /parse tree:
+
+parse ();
+
+generate_public_ast ();
+
+???
+=============================
+Profit!
+=============================
+AST:
+
+resolve ()
+1. if it's not (a candidate for) attribute, resolve own data type 
+1.1 if exists, it's MarkupTemp 
+1.2 if not exists, it's a ComplexAttribute (w/ text as children, or MarkupRoot node). Add to parent.
+
+2. recurse step 1. over children
+
+resolve_hints ():
+3. cherry-pick creation and composition methods => parameter resolution
+  Given a data type, set aside creation parameters. These will be used with base() or base.parameter etc.
+(DONE for creation methods of temps. TODO for all tags, and for composition methods)
+4. recurse step 3. over children
+
+resolve_attributes ():
+5. attribute resolution. Recurse over children
+TODO: unroll the resolving loop so that it's recursive and can be re-used from ComplexAttribute (with the resolver's help)
+(hint: ComplexAttribute should not derive from MarkupTag. Instead, it should *have* a MarkupRoot)
+
+
+=====TODO======!!!
+rename MarkupSubTag => MarkupChildTag
+rename SimpleMarkupAttribute => MarkupSimpleAttribute
+WTF's the difference between Symbol and DataType?
+ Short answer: A symbol has one or more data types
+Define the exact order of determining attributes, complex attributes etc. given that some (g:preconstruct for example) are built-in!!
+
+==VALA bugs==
+Resolver is not reentrant
+BooleanLiteral _requires_ source reference
+writing creation method names in CodeWriter (patch exists)
+
+diff --git a/vala/valacodewriter.vala b/vala/valacodewriter.vala
+index 55dd513..756e325 100644
+--- a/vala/valacodewriter.vala
++++ b/vala/valacodewriter.vala
+@@ -1353,6 +1353,10 @@ public class Vala.CodeWriter : CodeVisitor {
+ 	public override void visit_object_creation_expression (ObjectCreationExpression expr) {
+ 		write_string ("new ");
+ 		write_type (expr.type_reference);
++		if (expr.constructor != null) {
++			write_string (".");
++			write_string (expr.constructor.name);
++		}
+ 		write_string (" (");
+ 
+ 		bool first = true;

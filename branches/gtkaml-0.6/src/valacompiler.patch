@@ -1,0 +1,112 @@
+--- ../vala/compiler/valacompiler.vala	2010-10-29 14:49:36.000000000 +0300
++++ src/gtkamlcompiler.vala	2010-10-30 15:49:41.000000000 +0300
+@@ -1,4 +1,4 @@
+-/* valacompiler.vala
++/* gtkamlcompiler.vala
+  *
+  * Copyright (C) 2006-2010  Jürg Billeter
+  * Copyright (C) 1996-2002, 2004, 2005, 2006 Free Software Foundation, Inc.
+@@ -19,11 +19,14 @@
+  *
+  * Author:
+  * 	Jürg Billeter <j@bitron.ch>
++ * Gtkaml adapted:
++ * 	Vlad Grecescu <b100dian@gmail.com>
+  */
+ 
+ using GLib;
++using Vala;
+ 
+-class Vala.Compiler {
++class Gtkaml.Compiler {
+ 	static string basedir;
+ 	static string directory;
+ 	static bool version;
+@@ -82,7 +85,7 @@
+ 
+ 	static bool run_output;
+ 
+-	private CodeContext context;
++	private Gtkaml.CodeContext context;
+ 
+ 	const OptionEntry[] options = {
+ 		{ "girdir", 0, 0, OptionArg.FILENAME_ARRAY, ref gir_directories, "Look for .gir files in DIRECTORY", "DIRECTORY..." },
+@@ -152,8 +155,8 @@
+ 	}
+ 
+ 	private int run () {
+-		context = new CodeContext ();
+-		CodeContext.push (context);
++		context = new Gtkaml.CodeContext ();
++		Vala.CodeContext.push (context);
+ 
+ 		// default to build executable
+ 		if (!ccode_only && !compile_only && output == null) {
+@@ -188,12 +191,12 @@
+ 		context.includedir = includedir;
+ 		context.output = output;
+ 		if (basedir == null) {
+-			context.basedir = CodeContext.realpath (".");
++			context.basedir = Vala.CodeContext.realpath (".");
+ 		} else {
+-			context.basedir = CodeContext.realpath (basedir);
++			context.basedir = Vala.CodeContext.realpath (basedir);
+ 		}
+ 		if (directory != null) {
+-			context.directory = CodeContext.realpath (directory);
++			context.directory = Vala.CodeContext.realpath (directory);
+ 		} else {
+ 			context.directory = context.basedir;
+ 		}
+@@ -279,7 +282,7 @@
+ 
+ 		if (fast_vapis != null) {
+ 			foreach (string vapi in fast_vapis) {
+-				var rpath = CodeContext.realpath (vapi);
++				var rpath = Vala.CodeContext.realpath (vapi);
+ 				var source_file = new SourceFile (context, SourceFileType.FAST, rpath);
+ 				context.add_source_file (source_file);
+ 			}
+@@ -307,7 +310,7 @@
+ 		bool has_c_files = false;
+ 
+ 		foreach (string source in sources) {
+-			if (context.add_source_filename (source, run_output)) {
++			if (context.add_source_filename (source, run_output || source.has_suffix (".gtkaml"))) {
+ 				if (source.has_suffix (".c")) {
+ 					has_c_files = true;
+ 				}
+@@ -325,6 +328,9 @@
+ 		var genie_parser = new Genie.Parser ();
+ 		genie_parser.parse (context);
+ 
++ 		var gtkaml_parser = new MarkupParser ();
++ 		gtkaml_parser.parse (context);
++
+ 		var gir_parser = new GirParser ();
+ 		gir_parser.parse (context);
+ 
+@@ -548,12 +554,12 @@
+ 		// initialize locale
+ 		Intl.setlocale (LocaleCategory.ALL, "");
+ 
+-		if (Path.get_basename (args[0]) == "vala" || Path.get_basename (args[0]) == "vala" + Config.PACKAGE_SUFFIX) {
++		if (Path.get_basename (args[0]) == "gtkaml") {
+ 			return run_source (args);
+ 		}
+ 
+ 		try {
+-			var opt_context = new OptionContext ("- Vala Compiler");
++			var opt_context = new OptionContext ("- Vala Gtkaml Compiler");
+ 			opt_context.set_help_enabled (true);
+ 			opt_context.add_main_entries (options, null);
+ 			opt_context.parse (ref args);
+@@ -564,7 +570,7 @@
+ 		}
+ 		
+ 		if (version) {
+-			stdout.printf ("Vala %s\n", Config.BUILD_VERSION);
++			stdout.printf ("Gtkaml %s\n (based on Vala %s)", Config.PACKAGE_VERSION, Config.VALA_VERSION);
+ 			return 0;
+ 		}
+ 		

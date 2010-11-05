@@ -1,0 +1,16 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+bindir=@bindir@
+includedir=@includedir@
+datarootdir=@datarootdir@
+datadir=@datadir@
+vapidir=@datadir@/vala/vapi
+
+Name: Gtkaml
+Description: The Gtkaml markup parser
+Version: @VERSION@
+Requires: libvala-@VALA_VERSION@
+Libs: -L${libdir} -lgtkaml
+Cflags: -I${includedir}/gtkaml-1.0
+

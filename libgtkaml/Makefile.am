@@ -33,14 +33,13 @@ libgtkaml_la_VALASOURCES = \
 	gtkamlmarkupparser.vala \
 	gtkamlmarkupscanner.vala \
 	gtkamlmarkupresolver.vala \
-	gtkamlmarkupattribute.vala \
-	gtkamlsimplemarkupattribute.vala \
-	gtkamlcomplexmarkupattribute.vala \
+	ast/gtkamlmarkupattribute.vala \
+	ast/gtkamlmarkupcomplexattribute.vala \
 	gtkamlmarkupclass.vala \
 	ast/gtkamlmarkuptag.vala \
 	ast/gtkamlmarkuproot.vala \
-	ast/gtkamlmarkupsubtag.vala \
-	ast/gtkamlunresolvedmarkupsubtag.vala \
+	ast/gtkamlmarkupchildtag.vala \
+	ast/gtkamlmarkupunresolvedtag.vala \
 	ast/gtkamlmarkupmember.vala \
 	ast/gtkamlmarkuptemp.vala \
 	gtkamlmarkupnamespace.vala \

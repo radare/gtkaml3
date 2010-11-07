@@ -99,7 +99,7 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 	
 	void parse_attribute (MarkupTag markup_tag, string name, string value) throws ParseError {
 		string undername = name.replace ("-", "_");
-		MarkupAttribute attribute = new SimpleMarkupAttribute (undername, value, markup_tag.source_reference);
+		MarkupAttribute attribute = new MarkupAttribute (undername, value, markup_tag.source_reference);
 		markup_tag.add_markup_attribute (attribute);
 	}
 	
@@ -127,7 +127,7 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 	}
 	
 	void parse_markup_subtag (MarkupScanner scanner, MarkupTag parent_tag) throws ParseError {
-		MarkupSubTag markup_tag = null;
+		MarkupChildTag markup_tag = null;
 		string identifier = null;
 		
 		if (scanner.node->get_ns_prop ("public", scanner.gtkaml_uri) != null) {
@@ -146,7 +146,7 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 			if (scanner.node->properties != null) { //has attributes
 				markup_tag = new MarkupTemp (parent_tag, scanner.node->name, parse_namespace (scanner), scanner.get_src ());
 			} else { 
-				markup_tag = new UnresolvedMarkupSubTag (parent_tag, scanner.node->name, parse_namespace (scanner), scanner.get_src ());
+				markup_tag = new MarkupUnresolvedTag (parent_tag, scanner.node->name, parse_namespace (scanner), scanner.get_src ());
 			}
 		}
 		

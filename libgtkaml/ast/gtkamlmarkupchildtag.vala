@@ -2,10 +2,10 @@ using GLib;
 using Vala;
 
 /*
- * MarkupSubTag is a MarkupTag that has itself a parent: 
+ * MarkupChildTag is a MarkupTag that has itself a parent: 
  * parent_tag, and g:existing, g:standalone, g:construct, g:private etc.
  */
-public abstract class Gtkaml.MarkupSubTag : MarkupTag {
+public abstract class Gtkaml.MarkupChildTag : MarkupTag {
 
 	public weak MarkupTag parent_tag {get;set;}
 
@@ -20,7 +20,7 @@ public abstract class Gtkaml.MarkupSubTag : MarkupTag {
 	 */
 	public Callable composition_method;
 
-	public MarkupSubTag (MarkupTag parent_tag, string tag_name, MarkupNamespace tag_namespace, SourceReference? source_reference) {
+	public MarkupChildTag (MarkupTag parent_tag, string tag_name, MarkupNamespace tag_namespace, SourceReference? source_reference) {
 		base (parent_tag.markup_class, tag_name, tag_namespace, source_reference);
 		this.parent_tag = parent_tag;
 	}
@@ -36,7 +36,7 @@ public abstract class Gtkaml.MarkupSubTag : MarkupTag {
 		//trim the list down to the explicit one, present with value = "true"
 		foreach (var candidate in candidates) {
 			var explicit = get_attribute (candidate.name);
-			if (explicit is SimpleMarkupAttribute && ((SimpleMarkupAttribute)explicit).attribute_value == "true") {
+			if (explicit is MarkupAttribute && ((MarkupAttribute)explicit).attribute_value == "true") {
 				remove_attribute (explicit);
 				candidates = new Vala.ArrayList<Callable> ();
 				candidates.add (candidate);
@@ -54,15 +54,15 @@ public abstract class Gtkaml.MarkupSubTag : MarkupTag {
 
 		int min = 100; Callable min_match_method = candidates.get (0);
 		int max = -1; Callable max_match_method = candidates.get (0);
-		SimpleMarkupAttribute max_self = new SimpleMarkupAttribute ("not-intialized-warning-was-true",null);
-		Vala.List<SimpleMarkupAttribute> matched_method_parameters = new Vala.ArrayList<MarkupAttribute> ();
+		MarkupAttribute max_self = new MarkupAttribute ("not-intialized-warning-was-true",null);
+		Vala.List<MarkupAttribute> matched_method_parameters = new Vala.ArrayList<MarkupAttribute> ();
 		
 		var i = 0;
 		
 		do {
 			var current_candidate = candidates.get (i);
 			
-			SimpleMarkupAttribute self;
+			MarkupAttribute self;
 			if (current_candidate.get_parameters ().size == 0) {
 				Report.warning (null, "%s composition method has no parameters".printf (current_candidate.name));
 				continue;
@@ -71,7 +71,7 @@ public abstract class Gtkaml.MarkupSubTag : MarkupTag {
 			var parameters = resolver.get_default_parameters (current_candidate.parent_symbol.get_full_name (), current_candidate, source_reference);
 			int matches = 0;
 
-			self = new SimpleMarkupAttribute (parameters.get(0).attribute_name, "{"+me+"}", source_reference);
+			self = new MarkupAttribute (parameters.get(0).attribute_name, "{"+me+"}", source_reference);
 			add_markup_attribute (self);
 
 			foreach (var parameter in parameters) {
@@ -141,7 +141,7 @@ public abstract class Gtkaml.MarkupSubTag : MarkupTag {
 		//for subtags: one of the creation method's name is present with the value "true"
 		foreach (var candidate in candidates) {
 			var explicit = get_attribute (candidate.name);
-			if (explicit is SimpleMarkupAttribute && ((SimpleMarkupAttribute)explicit).attribute_value == "true") {
+			if (explicit is MarkupAttribute && ((MarkupAttribute)explicit).attribute_value == "true") {
 				remove_attribute (explicit);
 				candidates = new Vala.ArrayList<CreationMethod> ();
 				candidates.add (candidate);

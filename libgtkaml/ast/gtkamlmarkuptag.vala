@@ -11,7 +11,7 @@ using Vala;
  */ 
 public abstract class Gtkaml.MarkupTag : Object {
 	
-	protected Vala.List<MarkupSubTag> child_tags = new Vala.ArrayList<MarkupSubTag> ();
+	protected Vala.List<MarkupChildTag> child_tags = new Vala.ArrayList<MarkupChildTag> ();
 	protected Vala.List<MarkupAttribute> markup_attributes = new Vala.ArrayList<MarkupAttribute> ();
 
 	/**
@@ -98,7 +98,7 @@ public abstract class Gtkaml.MarkupTag : Object {
 
 	/**
 	 * Called when Gtkaml is resolving. 
-	 * Here replacements in the Gtkaml AST can be made (e.g. UnresolvedMarkupTag -> MarkupTemp).
+	 * Here replacements in the Gtkaml AST can be made (e.g. MarkupUnresolvedTag -> MarkupTemp).
 	 * Tags to remove must return 'null' here so that the SymbolResolver can remove them later
 	 */
 	public virtual MarkupTag? resolve (MarkupResolver resolver) throws ParseError {
@@ -142,7 +142,7 @@ public abstract class Gtkaml.MarkupTag : Object {
 
 		int min = 100; CreationMethod min_match_method = candidates.get (0);
 		int max = -1; CreationMethod max_match_method = candidates.get (0);
-		Vala.List<SimpleMarkupAttribute> matched_method_parameters = new Vala.ArrayList<MarkupAttribute> ();
+		Vala.List<MarkupAttribute> matched_method_parameters = new Vala.ArrayList<MarkupAttribute> ();
 		
 		var i = 0;
 		
@@ -231,11 +231,11 @@ public abstract class Gtkaml.MarkupTag : Object {
 		return candidates;
 	}
 	
-	public Vala.List<MarkupSubTag> get_child_tags () {
+	public Vala.List<MarkupChildTag> get_child_tags () {
 		return child_tags;
 	}	
 		
-	public void add_child_tag (MarkupSubTag child_tag) {
+	public void add_child_tag (MarkupChildTag child_tag) {
 		child_tags.add (child_tag);
 		child_tag.parent_tag = this;
 	}
@@ -243,10 +243,10 @@ public abstract class Gtkaml.MarkupTag : Object {
 	/**
 	 * replaces a child tag and moves all its attributes and subtags to the new one
 	 */
-	public void replace_child_tag (MarkupSubTag old_child, MarkupSubTag new_child) {
+	public void replace_child_tag (MarkupChildTag old_child, MarkupChildTag new_child) {
 		for (int i = 0; i < child_tags.size; i++) {
 			if (child_tags[i] == old_child) {
-				foreach (MarkupSubTag child_tag in child_tags[i].get_child_tags ())
+				foreach (MarkupChildTag child_tag in child_tags[i].get_child_tags ())
 					new_child.add_child_tag (child_tag);
 				foreach (MarkupAttribute attribute in child_tags[i].get_markup_attributes ())
 					new_child.add_markup_attribute (attribute);				
@@ -256,7 +256,7 @@ public abstract class Gtkaml.MarkupTag : Object {
 		}
 	}
 	
-	public void remove_child_tag (MarkupSubTag old_child) {
+	public void remove_child_tag (MarkupChildTag old_child) {
 		child_tags.remove (old_child);
 	}
 

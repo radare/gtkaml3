@@ -5,11 +5,11 @@ using Vala;
  * Any markup tag encountered in XML that is not the root, nor has g:public/g:private identifier.
  * Can later morph into a complex attribute or into a temp
  */
-public class Gtkaml.UnresolvedMarkupSubTag : MarkupSubTag {
+public class Gtkaml.MarkupUnresolvedTag : MarkupChildTag {
 
 	public override string me { get { assert_not_reached(); } }
 	
-	public UnresolvedMarkupSubTag (MarkupTag parent_tag, string tag_name, MarkupNamespace tag_namespace, SourceReference? source_reference = null)
+	public MarkupUnresolvedTag (MarkupTag parent_tag, string tag_name, MarkupNamespace tag_namespace, SourceReference? source_reference = null)
 	{
 		base (parent_tag, tag_name, tag_namespace, source_reference);
 	}	

@@ -4,7 +4,7 @@ using Vala;
 /**
  * Represents an attribute of a MarkupTag
  */
-public class Gtkaml.SimpleMarkupAttribute : Object, MarkupAttribute {
+public class Gtkaml.MarkupAttribute {
 	public string attribute_name {get { return _attribute_name; }}
 	public DataType target_type { get; set; }
 
@@ -14,20 +14,20 @@ public class Gtkaml.SimpleMarkupAttribute : Object, MarkupAttribute {
 
 	public string? attribute_value {get; private set;}
 	
-	public SimpleMarkupAttribute (string attribute_name, string? attribute_value, SourceReference? source_reference = null) {
+	public MarkupAttribute (string attribute_name, string? attribute_value, SourceReference? source_reference = null) {
 		this._attribute_name = attribute_name;
 		this.attribute_value = attribute_value;
 		this.source_reference = source_reference;
 	}
 
-	public SimpleMarkupAttribute.with_type (string attribute_name, string? attribute_value, DataType target_type, SourceReference? source_reference = null) {
+	public MarkupAttribute.with_type (string attribute_name, string? attribute_value, DataType target_type, SourceReference? source_reference = null) {
 		this._attribute_name = attribute_name;
 		this.attribute_value = attribute_value;
 		this.target_type = target_type;
 		this.source_reference = source_reference;
 	}
 	
-	public Expression get_expression (MarkupResolver resolver, MarkupTag markup_tag) throws ParseError {
+	public virtual Expression get_expression (MarkupResolver resolver, MarkupTag markup_tag) throws ParseError {
 		resolve (resolver, markup_tag);
 		
 		string stripped_value = attribute_value.strip ();
@@ -68,7 +68,7 @@ public class Gtkaml.SimpleMarkupAttribute : Object, MarkupAttribute {
 		assert_not_reached ();//TODO remove this?
 	}
 
-	public Statement get_assignment (MarkupResolver resolver, MarkupTag markup_tag) throws ParseError {
+	public virtual Statement get_assignment (MarkupResolver resolver, MarkupTag markup_tag) throws ParseError {
 		resolve (resolver, markup_tag);
 
 		var parent_access = new MemberAccess.simple (markup_tag.me, source_reference);
@@ -85,7 +85,7 @@ public class Gtkaml.SimpleMarkupAttribute : Object, MarkupAttribute {
 		return new ExpressionStatement (assignment);
 	}
 	
-	public void resolve (MarkupResolver resolver, MarkupTag markup_tag) throws ParseError {
+	public virtual void resolve (MarkupResolver resolver, MarkupTag markup_tag) throws ParseError {
 
 		assert (markup_tag.resolved_type is ObjectType);
 		var cl = ((ObjectType)markup_tag.resolved_type).type_symbol;

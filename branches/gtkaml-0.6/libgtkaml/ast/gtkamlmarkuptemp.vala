@@ -4,7 +4,7 @@ using Vala;
 /**
  * Markup tag that has no g:private or g:public gtkaml attribute, therefore is local to the construct method
  */
-public class Gtkaml.MarkupTemp : MarkupSubTag {
+public class Gtkaml.MarkupTemp : MarkupChildTag {
 	private string temp_name;
 	
 	public override string me { get { return temp_name; } }

@@ -74,7 +74,7 @@ public class Gtkaml.MarkupResolver : SymbolResolver {
 		MarkupTag? resolved_tag = markup_tag.resolve (this);
 		
 		if (resolved_tag != null) {
-			Vala.List<MarkupSubTag> to_remove = new Vala.ArrayList<MarkupSubTag> ();
+			Vala.List<MarkupChildTag> to_remove = new Vala.ArrayList<MarkupChildTag> ();
 
 			//recurse
 			foreach (var child_tag in resolved_tag.get_child_tags ()) {
@@ -99,8 +99,8 @@ public class Gtkaml.MarkupResolver : SymbolResolver {
 		markup_tag.generate_attributes (this);
 	}
 		
-	public Vala.List<SimpleMarkupAttribute> get_default_parameters (string full_type_name, Callable m, SourceReference? source_reference = null) {
-		var parameters = new Vala.ArrayList<SimpleMarkupAttribute> ();
+	public Vala.List<MarkupAttribute> get_default_parameters (string full_type_name, Callable m, SourceReference? source_reference = null) {
+		var parameters = new Vala.ArrayList<MarkupAttribute> ();
 		var hint = markup_hints.markup_hints.get (full_type_name);
 		if (hint != null) {
 			Vala.List <Pair<string, string?>> parameter_hints = hint.get_creation_method_parameters (m.name);
@@ -114,7 +114,7 @@ public class Gtkaml.MarkupResolver : SymbolResolver {
 				int i = 0;
 				foreach (var formal_parameter in m.get_parameters ()) {
 					assert ( i < parameter_hints.size );
-					var parameter = new SimpleMarkupAttribute.with_type ( parameter_hints.get (i).name, parameter_hints.get (i).value, formal_parameter.variable_type, source_reference );
+					var parameter = new MarkupAttribute.with_type ( parameter_hints.get (i).name, parameter_hints.get (i).value, formal_parameter.variable_type, source_reference );
 					parameters.add (parameter);
 					i++;
 				}
@@ -122,7 +122,7 @@ public class Gtkaml.MarkupResolver : SymbolResolver {
 			}
 		}
 		foreach (var formal_parameter in m.get_parameters ()) {
-			var parameter = new SimpleMarkupAttribute.with_type ( formal_parameter.name, null, formal_parameter.variable_type );
+			var parameter = new MarkupAttribute.with_type ( formal_parameter.name, null, formal_parameter.variable_type );
 			parameters.add (parameter);
 		}
 		return parameters;

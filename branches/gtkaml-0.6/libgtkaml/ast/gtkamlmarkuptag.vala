@@ -30,7 +30,7 @@ public abstract class Gtkaml.MarkupTag : Object {
 	public MarkupNamespace tag_namespace {get; set;}
 
 	/**
-	 * the Vala class in which this tag was defined
+	 * references the Vala class in which this tag was defined
 	 */
 	public weak MarkupClass markup_class {get; private set;}
 

@@ -51,18 +51,25 @@ public class Gtkaml.MarkupAttribute {
 				Report.error (source_reference, "Unmatched closing brace in %'s value.".printf (attribute_name));
 			}
 		} else {
-		
-			assert (target_type != null);
-			var type_name = target_type.data_type.get_full_name ();
-			if (type_name == "string") {
-				return new StringLiteral ("\"" + attribute_value + "\"", source_reference);
-			} else if (type_name == "bool") {
-				//TODO: full boolean check 
-				return new BooleanLiteral (attribute_value == "true", source_reference);
-			} else if (type_name == "int" || type_name == "uint") {
-				return new IntegerLiteral (attribute_value, source_reference);
+			if (_signal != null) {
+				Expression symbol_access = null;
+				foreach (var symbol in stripped_value.split ("."))
+					symbol_access = new MemberAccess (symbol_access, symbol, source_reference);
+				return symbol_access;
 			} else {
-				Report.error (source_reference, "Error: attribute literal of '%s' type found\n".printf (target_type.data_type.get_full_name ()));
+				assert (target_type != null);
+				var type_name = target_type.data_type.get_full_name ();
+				if (type_name == "string") {
+					return new StringLiteral ("\"" + attribute_value.replace ("\"", "\\\"") + "\"", source_reference);
+				} else if (type_name == "bool") {
+					//TODO: full boolean check 
+					return new BooleanLiteral (attribute_value == "true", source_reference);
+				} else if (type_name == "int" || type_name == "uint") {
+					return new IntegerLiteral (attribute_value, source_reference);
+				} else {
+					Report.error (source_reference, "Error: attribute literal of '%s' type found\n".printf (target_type.data_type.get_full_name ()));
+				}
+				//TODO enum here too
 			}
 		}
 		assert_not_reached ();//TODO remove this?
@@ -92,14 +99,15 @@ public class Gtkaml.MarkupAttribute {
 		
 		Symbol? resolved_attribute = resolver.search_symbol (cl, attribute_name);
 		
-		if (resolved_attribute is Property)
-		{
+		if (resolved_attribute is Property) {
 			target_type = ((Property)resolved_attribute).property_type.copy ();
 		} else if (resolved_attribute is Field) {
 			target_type = ((Field)resolved_attribute).variable_type.copy ();
 		} else if (resolved_attribute is Vala.Signal) {
 			_signal = (Vala.Signal)resolved_attribute;
-		} 
+		} else {
+			//TODO: it's a parameter for add/create .. maybe
+		}
 	}
 
 }

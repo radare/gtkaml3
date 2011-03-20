@@ -22,6 +22,9 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 	public void parse_file (SourceFile source_file) {
 		try {
 			MarkupScanner scanner = new MarkupScanner(source_file);
+			
+			parse_using_directives (scanner);
+
 			parse_markup_class (scanner);
 		} catch (ParseError e) {
 			Report.error (null, e.message);
@@ -29,21 +32,21 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 	}
 
 	void parse_markup_class (MarkupScanner scanner) throws ParseError {
-		parse_gtkaml_uri (scanner);
 		
 		MarkupNamespace base_ns = parse_namespace (scanner);
-
 		string class_name = parse_identifier (scanner.node->get_ns_prop ("name", scanner.gtkaml_uri));
 		string base_name = parse_identifier (scanner.node->name);
+
 		MarkupClass markup_class = new MarkupClass (base_name, base_ns, class_name, scanner.get_src ());
+
+		//TODO: set markupClass access to internal or public
 		markup_class.access = SymbolAccessibility.PUBLIC;
+
 		//TODO: create another NS in lieu of target_namespace
 		Namespace target_namespace = context.root;
 		
 		target_namespace.add_class (markup_class);
 		//scanner.source_file.add_node (markup_class);
-
-		parse_using_directives (scanner);
 
 		markup_class.markup_root.text = parse_text (scanner);
 		parse_attributes (scanner, markup_class.markup_root);
@@ -74,16 +77,6 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 		MarkupNamespace ns = new MarkupNamespace (null, scanner.node->ns->href);
 		ns.explicit_prefix = (scanner.node->ns->prefix != null);
 		return ns;
-	}
-
-	void parse_gtkaml_uri (MarkupScanner scanner) throws ParseError {
-		for (Ns* ns = scanner.node->ns_def; ns != null; ns = ns->next) {
-			if (ns->href.has_prefix ("http://gtkaml.org")) {
-				scanner.gtkaml_uri = ns->href;
-				return;
-			}
-		}
-		throw new ParseError.SYNTAX ("No gtkaml namespace found.");
 	}
 	
 	void parse_attributes (MarkupScanner scanner, MarkupTag markup_tag) throws ParseError {

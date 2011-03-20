@@ -123,8 +123,30 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 	
 	void parse_markup_subtag (MarkupScanner scanner, MarkupTag parent_tag) throws ParseError {
 		MarkupChildTag markup_tag = null;
-		string identifier = null;
 		SymbolAccessibility accessibility = SymbolAccessibility.PUBLIC;
+
+		string identifier = parse_markup_subtag_identifier (scanner, ref accessibility);
+
+		if (identifier != null) {
+			markup_tag = new MarkupMember (parent_tag, scanner.node->name, parse_namespace (scanner), identifier, accessibility, scanner.get_src ());			
+		} else {
+			if (scanner.node->properties != null) { //has attributes
+				markup_tag = new MarkupTemp (parent_tag, scanner.node->name, parse_namespace (scanner), scanner.get_src ());
+			} else { 
+				markup_tag = new MarkupUnresolvedTag (parent_tag, scanner.node->name, parse_namespace (scanner), scanner.get_src ());
+			}
+		}
+		
+		parent_tag.add_child_tag (markup_tag);
+		parse_attributes (scanner, markup_tag);
+		markup_tag.generate_public_ast (this);
+		
+		parse_markup_subtags (scanner, markup_tag);
+	}
+	
+	string parse_markup_subtag_identifier (MarkupScanner scanner, ref SymbolAccessibility accessibility) throws ParseError
+	{
+		string identifier = null;
 		
 		if (scanner.node->get_ns_prop ("public", scanner.gtkaml_uri) != null) {
 			identifier = parse_identifier (scanner.node->get_ns_prop ("public", scanner.gtkaml_uri));
@@ -151,23 +173,9 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 			identifier = parse_identifier (scanner.node->get_ns_prop ("private", scanner.gtkaml_uri));
 			accessibility = SymbolAccessibility.PUBLIC;
 		} 
-
-		if (identifier != null) {
-			markup_tag = new MarkupMember (parent_tag, scanner.node->name, parse_namespace (scanner), identifier, accessibility, scanner.get_src ());			
-		} else {
-			if (scanner.node->properties != null) { //has attributes
-				markup_tag = new MarkupTemp (parent_tag, scanner.node->name, parse_namespace (scanner), scanner.get_src ());
-			} else { 
-				markup_tag = new MarkupUnresolvedTag (parent_tag, scanner.node->name, parse_namespace (scanner), scanner.get_src ());
-			}
-		}
 		
-		parent_tag.add_child_tag (markup_tag);
-		parse_attributes (scanner, markup_tag);
-		markup_tag.generate_public_ast (this);
-		
-		parse_markup_subtags (scanner, markup_tag);
-	}
+		return identifier;
+	}		
 
 	void parse_gtkaml_tag (MarkupScanner scanner, MarkupTag parent_tag) {
 		message ("found gtkaml tag %s".printf (scanner.node->name)); //TODO

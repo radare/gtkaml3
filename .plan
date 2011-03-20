@@ -48,7 +48,8 @@ rename UnresolvedMarkupTag => MarkupUnresolvedTag
 
 WTF's the difference between Symbol and DataType?
  Short answer: A symbol has one or more data types
-Define the exact order of determining attributes, complex attributes etc. given that some (g:preconstruct for example) are built-in!!
+!Define the exact order of determining attributes, complex attributes etc. given that some (g:preconstruct for example) are built-in!!
+!I am on it
 
 ==VALA bugs==
 Resolver is not reentrant

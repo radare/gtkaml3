@@ -7,6 +7,17 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 	private Vala.CodeContext context;
 	public ValaParser vala_parser;
 
+	public Vala.List<string> identifier_attributes;
+	public Vala.List<string> classname_attributes;
+	public Vala.List<string> parsetime_attributes;
+
+	
+	public MarkupParser () 
+	{
+		base ();	
+		init_attribute_lists ();
+	}
+
 	public void parse (Vala.CodeContext context) {
 		this.context = context;
 		this.vala_parser = new ValaParser ();
@@ -84,10 +95,14 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 			if (attr->ns == null) {
 				parse_attribute (markup_tag, attr->name, attr->children->content);
 			} else {
-				if (attr->ns->href != scanner.gtkaml_uri) {
+				if (attr->ns->href == scanner.gtkaml_uri) {
+					if (!parsetime_attributes.contains (attr->name)) {
+						//TODO add them there
+						Report.warning (scanner.get_src (), "Attribute %s:%s ingored".printf (attr->ns->prefix, attr->name));
+					}
+				} else {
 					throw new ParseError.SYNTAX ("Attribute prefix not expected: %s".printf (attr->ns->href));
 				} 
-				//Report.warning (scanner.get_src (), "Attribute %s:%s ingored".printf (attr->ns->prefix, attr->name));
 			}
 		}
 	}
@@ -148,39 +163,40 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 	{
 		string identifier = null;
 		
-		if (scanner.node->get_ns_prop ("public", scanner.gtkaml_uri) != null) {
-			identifier = parse_identifier (scanner.node->get_ns_prop ("public", scanner.gtkaml_uri));
-			accessibility = SymbolAccessibility.PUBLIC;
-		}  
-
-		if (scanner.node->get_ns_prop ("internal", scanner.gtkaml_uri) != null) {
-			if (identifier != null) 
-				throw new ParseError.SYNTAX ("Cannot specify more than one of: private, protected, internal, public");
-			identifier = parse_identifier (scanner.node->get_ns_prop ("internal", scanner.gtkaml_uri));
-			accessibility = SymbolAccessibility.INTERNAL;
-		} 
-		
-		if (scanner.node->get_ns_prop ("protected", scanner.gtkaml_uri) != null) {
-			if (identifier != null) 
-				throw new ParseError.SYNTAX ("Cannot specify more than one of: private, protected, internal, public");
-			identifier = parse_identifier (scanner.node->get_ns_prop ("protected", scanner.gtkaml_uri));
-			accessibility = SymbolAccessibility.PROTECTED;
-		}
-				
-		if (scanner.node->get_ns_prop ("private", scanner.gtkaml_uri) != null) {
-			if (identifier != null) 
-				throw new ParseError.SYNTAX ("Cannot specify more than one of: private, protected, internal, public");
-			identifier = parse_identifier (scanner.node->get_ns_prop ("private", scanner.gtkaml_uri));
-			accessibility = SymbolAccessibility.PUBLIC;
-		} 
-		
+		foreach (var identifier_attribute in identifier_attributes) {
+			if (scanner.node->get_ns_prop (identifier_attribute, scanner.gtkaml_uri) != null) {
+				if (identifier != null) 
+					throw new ParseError.SYNTAX ("Cannot specify more than one of: private, protected, internal, public");
+				identifier = parse_identifier (scanner.node->get_ns_prop (identifier_attribute, scanner.gtkaml_uri));
+				accessibility = SymbolAccessibility.INTERNAL;
+			} 
+		}		
 		return identifier;
 	}		
 
 	void parse_gtkaml_tag (MarkupScanner scanner, MarkupTag parent_tag) {
+		//TODO gtkaml:construct, preconstruct and .. any other?
 		message ("found gtkaml tag %s".printf (scanner.node->name)); //TODO
 	}
 	
+	void init_attribute_lists () {
+		identifier_attributes = new ArrayList<string> (GLib.str_equal);
+		identifier_attributes.add ("public");
+		identifier_attributes.add ("private");
+		identifier_attributes.add ("protected");
+		identifier_attributes.add ("internal");
+		
+		classname_attributes = new ArrayList<string> (GLib.str_equal);
+		classname_attributes.add ("public");
+		classname_attributes.add ("internal");
+		classname_attributes.add ("name");
 
+		parsetime_attributes = new ArrayList<string> (GLib.str_equal);
+		foreach (var a in identifier_attributes)
+			parsetime_attributes.add (a);
+		foreach (var a in classname_attributes)
+			parsetime_attributes.add (a);
+	}
+		
 }
 

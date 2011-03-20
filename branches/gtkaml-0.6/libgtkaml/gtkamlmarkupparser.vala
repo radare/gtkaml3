@@ -168,7 +168,7 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 				if (identifier != null) 
 					throw new ParseError.SYNTAX ("Cannot specify more than one of: private, protected, internal, public");
 				identifier = parse_identifier (scanner.node->get_ns_prop (identifier_attribute, scanner.gtkaml_uri));
-				accessibility = SymbolAccessibility.INTERNAL;
+				accessibility = (SymbolAccessibility)identifier_attributes.index_of (identifier_attribute);
 			} 
 		}		
 		return identifier;
@@ -181,10 +181,10 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 	
 	void init_attribute_lists () {
 		identifier_attributes = new ArrayList<string> (GLib.str_equal);
-		identifier_attributes.add ("public");
 		identifier_attributes.add ("private");
-		identifier_attributes.add ("protected");
 		identifier_attributes.add ("internal");
+		identifier_attributes.add ("protected");
+		identifier_attributes.add ("public");
 		
 		classname_attributes = new ArrayList<string> (GLib.str_equal);
 		classname_attributes.add ("public");

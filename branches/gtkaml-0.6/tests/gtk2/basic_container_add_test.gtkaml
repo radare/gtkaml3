@@ -2,7 +2,7 @@
       <Label label="_Hello" with-mnemonic="true" expand="false" fill="{1==0}" padding="{0}" />
       <HPaned>
           <Entry text="ok" g:public='entry' changed='{GLib.debug("text changed");}' />
-          <Label g:private="label" label="World" add2="true"/>
+          <Label g:internal="label" label="World" add2="true"/>
       </HPaned>
 <![CDATA[
 	public static int main (string[] argv) {

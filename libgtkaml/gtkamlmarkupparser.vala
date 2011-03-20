@@ -83,10 +83,12 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 		for (Attr* attr = scanner.node->properties; attr != null; attr = attr->next) {
 			if (attr->ns == null) {
 				parse_attribute (markup_tag, attr->name, attr->children->content);
-			} else
-			if (attr->ns->href != scanner.gtkaml_uri) {
-				throw new ParseError.SYNTAX ("Attribute prefix not expected: %s".printf (attr->ns->href));
-			} 
+			} else {
+				if (attr->ns->href != scanner.gtkaml_uri) {
+					throw new ParseError.SYNTAX ("Attribute prefix not expected: %s".printf (attr->ns->href));
+				} 
+				//Report.warning (scanner.get_src (), "Attribute %s:%s ingored".printf (attr->ns->prefix, attr->name));
+			}
 		}
 	}
 	
@@ -122,20 +124,37 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 	void parse_markup_subtag (MarkupScanner scanner, MarkupTag parent_tag) throws ParseError {
 		MarkupChildTag markup_tag = null;
 		string identifier = null;
+		SymbolAccessibility accessibility = SymbolAccessibility.PUBLIC;
 		
 		if (scanner.node->get_ns_prop ("public", scanner.gtkaml_uri) != null) {
 			identifier = parse_identifier (scanner.node->get_ns_prop ("public", scanner.gtkaml_uri));
-			markup_tag = new MarkupMember (parent_tag, scanner.node->name, parse_namespace (scanner), identifier, SymbolAccessibility.PUBLIC, scanner.get_src ());
+			accessibility = SymbolAccessibility.PUBLIC;
 		}  
-		
-		if (scanner.node->get_ns_prop ("private", scanner.gtkaml_uri) != null) {
+
+		if (scanner.node->get_ns_prop ("internal", scanner.gtkaml_uri) != null) {
 			if (identifier != null) 
-				throw new ParseError.SYNTAX ("Cannot specify both private and public");
-			identifier = parse_identifier (scanner.node->get_ns_prop ("private", scanner.gtkaml_uri));
-			markup_tag = new MarkupMember (parent_tag, scanner.node->name, parse_namespace (scanner), identifier, SymbolAccessibility.PRIVATE, scanner.get_src ());
+				throw new ParseError.SYNTAX ("Cannot specify more than one of: private, protected, internal, public");
+			identifier = parse_identifier (scanner.node->get_ns_prop ("internal", scanner.gtkaml_uri));
+			accessibility = SymbolAccessibility.INTERNAL;
 		} 
 		
-		if (markup_tag == null) {
+		if (scanner.node->get_ns_prop ("protected", scanner.gtkaml_uri) != null) {
+			if (identifier != null) 
+				throw new ParseError.SYNTAX ("Cannot specify more than one of: private, protected, internal, public");
+			identifier = parse_identifier (scanner.node->get_ns_prop ("protected", scanner.gtkaml_uri));
+			accessibility = SymbolAccessibility.PROTECTED;
+		}
+				
+		if (scanner.node->get_ns_prop ("private", scanner.gtkaml_uri) != null) {
+			if (identifier != null) 
+				throw new ParseError.SYNTAX ("Cannot specify more than one of: private, protected, internal, public");
+			identifier = parse_identifier (scanner.node->get_ns_prop ("private", scanner.gtkaml_uri));
+			accessibility = SymbolAccessibility.PUBLIC;
+		} 
+
+		if (identifier != null) {
+			markup_tag = new MarkupMember (parent_tag, scanner.node->name, parse_namespace (scanner), identifier, accessibility, scanner.get_src ());			
+		} else {
 			if (scanner.node->properties != null) { //has attributes
 				markup_tag = new MarkupTemp (parent_tag, scanner.node->name, parse_namespace (scanner), scanner.get_src ());
 			} else { 

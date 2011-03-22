@@ -47,7 +47,8 @@ libgtkaml_la_VALASOURCES = \
 	gtkamlmarkuphintsstore.vala \
 	workarounds/gtkamldatatypeparent.vala \
 	workarounds/gtkamlcallable.vala \
-	workarounds/gtkamlvalaparser.vala
+	workarounds/gtkamlvalaparser.vala \
+	workarounds/gtkamlnamespacevisitor.vala
 
 nodist_libgtkaml_la_SOURCES = \
 	libgtkaml.stamp \

@@ -20,7 +20,7 @@ public class Gtkaml.MarkupResolver : SymbolResolver {
 
 	public void resolve (CodeContext context) {
 		markup_hints = new MarkupHintsStore (context);
-		vala_parser = new ValaParser ();
+		vala_parser = new ValaParser (context);
 		markup_hints.parse ();
 		this.context = context;
 		base.resolve (context);

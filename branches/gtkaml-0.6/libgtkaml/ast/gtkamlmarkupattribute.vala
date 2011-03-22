@@ -68,9 +68,11 @@ public class Gtkaml.MarkupAttribute {
 					return new IntegerLiteral (attribute_value, source_reference);
 				} else if (type_name == "double" || type_name == "float") {
 					return new RealLiteral (attribute_value, source_reference);
+				} else if (target_type is ReferenceType && stripped_value == "null") {
+					return new NullLiteral (source_reference);
 				} else {
 					Report.error (source_reference, "Error: attribute literal of '%s' type found\n".printf (target_type.data_type.get_full_name ()));
-				}
+				} 
 				//TODO enum here too
 			}
 		}

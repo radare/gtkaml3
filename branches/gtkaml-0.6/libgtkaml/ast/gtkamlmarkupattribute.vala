@@ -66,6 +66,8 @@ public class Gtkaml.MarkupAttribute {
 					return new BooleanLiteral (attribute_value == "true", source_reference);
 				} else if (type_name == "int" || type_name == "uint") {
 					return new IntegerLiteral (attribute_value, source_reference);
+				} else if (type_name == "double" || type_name == "float") {
+					return new RealLiteral (attribute_value, source_reference);
 				} else {
 					Report.error (source_reference, "Error: attribute literal of '%s' type found\n".printf (target_type.data_type.get_full_name ()));
 				}

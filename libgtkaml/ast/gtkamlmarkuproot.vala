@@ -43,7 +43,7 @@ public class Gtkaml.MarkupRoot : MarkupTag {
 
 
 	private void parse_class_members (MarkupParser parser, string source) throws ParseError {
-		var temp_class = parser.vala_parser.parse_members (markup_class.name, source);
+		var temp_class = parser.vala_parser.parse_members (markup_class, source);
 		foreach (var x in temp_class.get_methods ()) {
 			if (!(x is CreationMethod))  {
 				markup_class.add_method (x);

@@ -4,7 +4,7 @@ using Xml;
 
 public class Gtkaml.MarkupParser : CodeVisitor {
 
-	private Vala.CodeContext context;
+	private CodeContext context;
 	public ValaParser vala_parser;
 
 	public Vala.List<string> identifier_attributes;
@@ -18,9 +18,9 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 		init_attribute_lists ();
 	}
 
-	public void parse (Vala.CodeContext context) {
+	public void parse (CodeContext context) {
 		this.context = context;
-		this.vala_parser = new ValaParser ();
+		this.vala_parser = new ValaParser (context);
 		context.accept (this);
 	}
 	

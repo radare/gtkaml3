@@ -35,7 +35,7 @@ public class Gtkaml.MarkupAttribute {
 			if (stripped_value.has_suffix ("}")) {
 				string code_source = stripped_value.substring (1, stripped_value.length - 2);
 				if (_signal != null) {
-					var stmts = resolver.vala_parser.parse_statements (markup_tag.markup_class.name, markup_tag.me, attribute_name, code_source);
+					var stmts = resolver.vala_parser.parse_statements (markup_tag.markup_class, markup_tag.me, attribute_name, code_source);
 					var lambda = new LambdaExpression.with_statement_body(stmts, source_reference);
 
 					lambda.add_parameter ("target");
@@ -45,7 +45,7 @@ public class Gtkaml.MarkupAttribute {
 					
 					return lambda;
 				} else {
-					return resolver.vala_parser.parse_expression (markup_tag.markup_class.name, markup_tag.me, attribute_name, code_source);
+					return resolver.vala_parser.parse_expression (markup_tag.markup_class, markup_tag.me, attribute_name, code_source);
 				}
 			} else {
 				Report.error (source_reference, "Unmatched closing brace in %'s value.".printf (attribute_name));

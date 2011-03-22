@@ -122,6 +122,10 @@ public class Gtkaml.MarkupResolver : SymbolResolver {
 			}
 		}
 		foreach (var formal_parameter in m.get_parameters ()) {
+			if (formal_parameter.ellipsis) {
+				parameters.add (new MarkupAttribute.with_type ( "...", "null", new NullType (source_reference)));
+				break;
+			}
 			var parameter = new MarkupAttribute.with_type ( formal_parameter.name, null, formal_parameter.variable_type );
 			parameters.add (parameter);
 		}

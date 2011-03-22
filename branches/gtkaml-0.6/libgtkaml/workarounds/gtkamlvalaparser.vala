@@ -5,7 +5,7 @@ public class Gtkaml.ValaParser {
 	private Vala.List<SourceFile> temp_source_files = new Vala.ArrayList<SourceFile> ();
 
 	public Class parse_members (string class_name, string members_source) throws ParseError  {
-		var temp_source = "public class Temp { %s }".printf (members_source);
+		var temp_source = "public class %s { %s }".printf (class_name, members_source);
 		
 		var temp_ns = parse (temp_source, class_name + "-members");
 		if (temp_ns is Namespace && temp_ns.get_classes ().size == 1) {

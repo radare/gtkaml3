@@ -44,11 +44,22 @@ public class Gtkaml.MarkupRoot : MarkupTag {
 
 	private void parse_class_members (MarkupParser parser, string source) throws ParseError {
 		var temp_class = parser.vala_parser.parse_members (markup_class, source);
+		foreach (var x in temp_class.get_constants ()) { markup_class.add_constant (x); };
+		foreach (var x in temp_class.get_fields ()) { markup_class.add_field (x); };
 		foreach (var x in temp_class.get_methods ()) {
-			if (!(x is CreationMethod))  {
+			if (!(x is CreationMethod && ((CreationMethod)x).name == ".new"))  {
 				markup_class.add_method (x);
+			} else {
+				Report.warning (null, "Ignoring %s () creation member".printf (markup_class.name));
 			}
 		}
+		foreach (var x in temp_class.get_properties ()) { markup_class.add_property (x); };
+		foreach (var x in temp_class.get_signals ()) { markup_class.add_signal (x); };
+		foreach (var x in temp_class.get_classes ()) { markup_class.add_class (x); };
+		foreach (var x in temp_class.get_structs ()) { markup_class.add_struct (x); };
+		foreach (var x in temp_class.get_enums ()) { markup_class.add_enum (x); };
+		foreach (var x in temp_class.get_delegates ()) { markup_class.add_delegate (x); };
+		
 	}
 
 	/**

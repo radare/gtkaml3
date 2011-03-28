@@ -65,7 +65,7 @@ public class Gtkaml.ValaParser {
 			foreach (var package in real_context.get_packages ())
 				ctx.add_package (package);
 */				
-			//TODO: use source_reference.using_directives?
+			//TODO: use source_reference.using_directives instead of original_source's..?
 			foreach (var using_directive in original_source.current_using_directives) {
 				temp_source_file.add_using_directive (using_directive);
 			}

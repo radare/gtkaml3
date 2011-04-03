@@ -1,9 +1,8 @@
 using GLib;
 using Vala;
 
-/*
- * MarkupChildTag is a MarkupTag that has itself a parent: 
- * parent_tag, and g:existing, g:standalone, g:construct, g:private etc.
+/**
+ * MarkupChildTag is a MarkupTag that has itself a parent: parent_tag, 
  */
 public abstract class Gtkaml.Ast.MarkupChildTag : MarkupTag {
 
@@ -43,7 +42,6 @@ public abstract class Gtkaml.Ast.MarkupChildTag : MarkupTag {
 				break;//before foreach complains
 			}
 		}
-		
 		
 		if (candidates.size == 0) {
 			Report.error (source_reference, "No composition methods found for adding %s to a %s".printf (full_name, parent_tag.full_name));

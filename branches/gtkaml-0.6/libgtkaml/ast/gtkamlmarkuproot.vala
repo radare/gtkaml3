@@ -1,6 +1,9 @@
 using GLib;
 using Vala;
 
+/**
+ * The root tag of the tag hierarchy
+ */
 public class Gtkaml.Ast.MarkupRoot : MarkupTag {
 
 	public MarkupRoot (MarkupClass markup_class, string tag_name, MarkupNamespace tag_namespace, SourceReference? source_reference = null) {
@@ -50,7 +53,7 @@ public class Gtkaml.Ast.MarkupRoot : MarkupTag {
 			if (!(x is CreationMethod && ((CreationMethod)x).name == ".new"))  {
 				markup_class.add_method (x);
 			} else {
-				Report.warning (null, "Ignoring %s () creation member".printf (markup_class.name));
+				Report.warning (null, "BUG: Ignoring %s () creation member".printf (markup_class.name));
 			}
 		}
 		foreach (var x in temp_class.get_properties ()) { markup_class.add_property (x); };
@@ -59,7 +62,6 @@ public class Gtkaml.Ast.MarkupRoot : MarkupTag {
 		foreach (var x in temp_class.get_structs ()) { markup_class.add_struct (x); };
 		foreach (var x in temp_class.get_enums ()) { markup_class.add_enum (x); };
 		foreach (var x in temp_class.get_delegates ()) { markup_class.add_delegate (x); };
-		
 	}
 
 	/**

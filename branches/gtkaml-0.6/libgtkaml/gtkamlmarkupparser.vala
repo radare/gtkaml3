@@ -143,6 +143,7 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 	}
 	
 	void parse_markup_subtag (MarkupScanner scanner, MarkupTag parent_tag) throws ParseError {
+		
 		MarkupChildTag markup_tag = null;
 		SymbolAccessibility accessibility = SymbolAccessibility.PUBLIC;
 
@@ -165,8 +166,8 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 		parse_markup_subtags (scanner, markup_tag);
 	}
 	
-	string parse_markup_subtag_identifier (MarkupScanner scanner, ref SymbolAccessibility accessibility) throws ParseError
-	{
+	string parse_markup_subtag_identifier (MarkupScanner scanner, ref SymbolAccessibility accessibility) throws ParseError {
+		
 		string identifier = null;
 		
 		foreach (var identifier_attribute in identifier_attributes) {

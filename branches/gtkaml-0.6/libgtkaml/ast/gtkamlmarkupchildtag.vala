@@ -6,6 +6,14 @@ using Vala;
  */
 public abstract class Gtkaml.Ast.MarkupChildTag : MarkupTag {
 
+	/**
+	 * Means it won't be added to the parent tag
+	 */
+	public bool standalone {get; set;}
+
+	/** 
+	 * Parent tag 
+	 */
 	public weak MarkupTag parent_tag {get;set;}
 
 	/**
@@ -29,7 +37,11 @@ public abstract class Gtkaml.Ast.MarkupChildTag : MarkupTag {
 		resolve_composition_method (resolver);
 	}
 
+	/**
+	 * determines the composition method to use, setting `composition_method` and `composition_parameters`
+	 */
 	protected void resolve_composition_method (MarkupResolver resolver) {
+		if (standalone) return;
 		var candidates = resolver.get_composition_method_candidates (this.parent_tag.resolved_type.data_type as TypeSymbol);
 		
 		//trim the list down to the explicit one, present with value = "true"
@@ -131,7 +143,7 @@ public abstract class Gtkaml.Ast.MarkupChildTag : MarkupTag {
 	}
 
 	/**
-	 * returns the list of possible creation methods, containing a single element if explicitly requested
+	 * returns the list of possible creation methods, containing a single element if explicitly requested with `creationmethod='true'`
 	 */
 	protected override Vala.List<CreationMethod> get_creation_method_candidates () {
 		var candidates = base.get_creation_method_candidates ();
@@ -150,6 +162,9 @@ public abstract class Gtkaml.Ast.MarkupChildTag : MarkupTag {
 		return candidates;
 	}
 
+	/**
+	 * creates the rvalue for the initializer expression
+	 */
 	protected ObjectCreationExpression get_initializer (MarkupResolver resolver) throws ParseError 
 	{
 		var creation_method_access = get_class_expression ();
@@ -171,8 +186,13 @@ public abstract class Gtkaml.Ast.MarkupChildTag : MarkupTag {
 		return initializer;
 	}
 
+	/**
+	 * generates the composition method call, unless standalone
+	 */
 	protected void generate_add (MarkupResolver resolver) throws ParseError 
 	{
+		if (standalone) return;
+		
 		var parent_member = new MemberAccess.simple (parent_tag.me, parent_tag.source_reference);
 		var method_call = new MethodCall (new MemberAccess (parent_member, composition_method.name, source_reference));
 		

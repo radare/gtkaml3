@@ -2,7 +2,7 @@ using GLib;
 using Vala;
 
 ////TODO: ComplexAttribute should not derive from MarkupTag. Instead, it should *have* a MarkupRoot
-public class Gtkaml.MarkupComplexAttribute : MarkupAttribute {
+public class Gtkaml.Ast.MarkupComplexAttribute : MarkupAttribute {
 
 	public MarkupComplexAttribute (string attribute_name, MarkupTag parent_tag, SourceReference? source_reference = null) {
 		base (attribute_name, parent_tag.me, source_reference);

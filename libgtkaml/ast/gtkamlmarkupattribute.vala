@@ -4,16 +4,16 @@ using Vala;
 /**
  * Represents an attribute of a MarkupTag
  */
-public class Gtkaml.MarkupAttribute {
-	public string attribute_name {get { return _attribute_name; }}
+public class Gtkaml.Ast.MarkupAttribute {
 	public DataType target_type { get; set; }
+	public string attribute_name {get { return _attribute_name; }}
+	public string? attribute_value {get; private set;}
+	
 
 	private SourceReference? source_reference;
 	private string _attribute_name;
 	private Vala.Signal? _signal = null;
 
-	public string? attribute_value {get; private set;}
-	
 	public MarkupAttribute (string attribute_name, string? attribute_value, SourceReference? source_reference = null) {
 		this._attribute_name = attribute_name;
 		this.attribute_value = attribute_value;
@@ -35,7 +35,7 @@ public class Gtkaml.MarkupAttribute {
 			if (stripped_value.has_suffix ("}")) {
 				string code_source = stripped_value.substring (1, stripped_value.length - 2);
 				if (_signal != null) {
-					var stmts = resolver.vala_parser.parse_statements (markup_tag.markup_class, markup_tag.me, attribute_name, code_source + ";");
+					var stmts = resolver.code_parser.parse_statements (markup_tag.markup_class, markup_tag.me, attribute_name, code_source + ";");
 					var lambda = new LambdaExpression.with_statement_body(stmts, source_reference);
 
 					lambda.add_parameter ("target");
@@ -45,7 +45,7 @@ public class Gtkaml.MarkupAttribute {
 					
 					return lambda;
 				} else {
-					return resolver.vala_parser.parse_expression (markup_tag.markup_class, markup_tag.me, attribute_name, code_source);
+					return resolver.code_parser.parse_expression (markup_tag.markup_class, markup_tag.me, attribute_name, code_source);
 				}
 			} else {
 				Report.error (source_reference, "Unmatched closing brace in %'s value.".printf (attribute_name));

@@ -20,11 +20,11 @@ public class Gtkaml.Ast.MarkupRoot : MarkupTag {
 		generate_creation_method (resolver);
 	}
 
+	//TODO: is this still necessary? maybe we should allow more candidates here too
 	/**
 	 * returns the list of possible creation methods, in root's case, only the default creation method
-	 * TODO: is this still necessary? maybe we should allow more candidates here too
 	 */
-	internal override Vala.List<CreationMethod> get_creation_method_candidates () {
+	protected override Vala.List<CreationMethod> get_creation_method_candidates () {
 		var candidates = base.get_creation_method_candidates ();
 		foreach (var candidate in candidates) {
 			if (candidate.name == ".new") {

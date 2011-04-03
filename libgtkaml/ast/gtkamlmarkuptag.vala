@@ -5,9 +5,10 @@ using Vala;
  * A tag that is a parent of others. Can be the root tag.
  * 
  * You have to implement:
- * * generate_public_ast
- * * (optionally) resolve
- * * generate
+ * 
+ *  * generate_public_ast
+ *  * (optionally) resolve
+ *  * generate
  */ 
 public abstract class Gtkaml.Ast.MarkupTag : Object {
 	

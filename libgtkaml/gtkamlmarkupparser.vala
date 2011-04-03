@@ -164,6 +164,8 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 			}
 		}
 		
+		markup_tag.standalone = parse_markup_subtag_is_standalone (scanner);
+		
 		parent_tag.add_child_tag (markup_tag);
 		parse_attributes (scanner, markup_tag);
 		markup_tag.generate_public_ast (this);
@@ -171,7 +173,7 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 		parse_markup_subtags (scanner, markup_tag);
 	}
 	
-	string parse_markup_subtag_identifier (MarkupScanner scanner, ref SymbolAccessibility accessibility) throws ParseError {
+	string? parse_markup_subtag_identifier (MarkupScanner scanner, ref SymbolAccessibility accessibility) throws ParseError {
 		
 		string identifier = null;
 		
@@ -186,7 +188,19 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 		return identifier;
 	}		
 
-	string parse_markup_subtag_reference (MarkupScanner scanner) throws ParseError {
+	bool parse_markup_subtag_is_standalone (MarkupScanner scanner) throws ParseError {
+		string standalone = scanner.node->get_ns_prop ("standalone", scanner.gtkaml_uri);
+		if (standalone == null || standalone == "false") {
+			return false;
+		} else {
+			if (standalone == "true")
+				return true;
+			else 
+				throw new ParseError.SYNTAX ("Invalid value for standalone : '%s'".printf (standalone));
+		}
+	}		
+
+	string? parse_markup_subtag_reference (MarkupScanner scanner) throws ParseError {
 		string reference = scanner.node->get_ns_prop ("existing", scanner.gtkaml_uri);
 		if (reference != null) {
 			return parse_identifier (reference);

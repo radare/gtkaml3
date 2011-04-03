@@ -212,7 +212,7 @@ public abstract class Gtkaml.Ast.MarkupTag : Object {
 	/**
 	 * returns the list of possible creation methods
 	 */
-	internal virtual Vala.List<CreationMethod> get_creation_method_candidates () {
+	protected virtual Vala.List<CreationMethod> get_creation_method_candidates () {
 		assert (resolved_type.data_type is Class);
 		#if DEBUGMARKUPHINTS
 		stderr.printf ("Searching for creation method candidates for %s:\n", resolved_type.data_type.get_full_name ()); 

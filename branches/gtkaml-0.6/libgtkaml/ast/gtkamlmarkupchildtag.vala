@@ -135,7 +135,7 @@ public abstract class Gtkaml.Ast.MarkupChildTag : MarkupTag {
 	/**
 	 * returns the list of possible creation methods, containing a single element if explicitly requested
 	 */
-	internal override Vala.List<CreationMethod> get_creation_method_candidates () {
+	protected override Vala.List<CreationMethod> get_creation_method_candidates () {
 		var candidates = base.get_creation_method_candidates ();
 		
 		//for subtags: one of the creation method's name is present with the value "true"

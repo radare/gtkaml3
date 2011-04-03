@@ -4,7 +4,7 @@ using Xml;
 /** 
  * Wrapper for Xml document
  */
-internal class Gtkaml.MarkupScanner {
+class Gtkaml.MarkupScanner {
 	public string gtkaml_uri {get; protected set;}
 	public Xml.Node* node;
 	public SourceFile source_file {get; protected set;}

@@ -10,7 +10,7 @@ public class Gtkaml.MarkupResolver : SymbolResolver {
 	public MarkupHintsStore markup_hints;
 	public ValaParser code_parser {get; private set;}
 
-	internal CodeContext context {get; set;}
+	CodeContext context {get; set;}
 
 	public void resolve (CodeContext context) {
 		markup_hints = new MarkupHintsStore (context);

@@ -21,7 +21,8 @@ public class Gtkaml.Ast.MarkupTemp : MarkupChildTag {
 	}
 
 	public override MarkupTag? resolve (MarkupResolver resolver) throws ParseError {
-		return base.resolve (resolver);
+		resolver.visit_data_type (data_type);
+		return this;
 	}
 	
 	public override void generate (MarkupResolver resolver) throws ParseError {

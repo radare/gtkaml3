@@ -29,7 +29,7 @@ public abstract class Gtkaml.Ast.MarkupChildTag : MarkupTag {
 		resolve_composition_method (resolver);
 	}
 
-	void resolve_composition_method (MarkupResolver resolver) {
+	protected void resolve_composition_method (MarkupResolver resolver) {
 		var candidates = resolver.get_composition_method_candidates (this.parent_tag.resolved_type.data_type as TypeSymbol);
 		
 		//trim the list down to the explicit one, present with value = "true"

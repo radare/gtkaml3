@@ -64,7 +64,7 @@ public abstract class Gtkaml.Ast.MarkupTag : Object {
 	/**
 	 * shortcut for resolved_type.data_type.get_full_name () -> for debugging
 	 */
-	public string full_name { get {	return _full_name; } }
+	public string full_name { get {	return _full_name = resolved_type.data_type.get_full_name (); } }
 	
 	/**
 	 * attributes explicitly found as creation parameters + default ones.
@@ -104,7 +104,6 @@ public abstract class Gtkaml.Ast.MarkupTag : Object {
 	 */
 	public virtual MarkupTag? resolve (MarkupResolver resolver) throws ParseError {
 		resolver.visit_data_type (data_type);
-		_full_name = resolved_type.data_type.get_full_name ();
 		return this;
 	}
 	

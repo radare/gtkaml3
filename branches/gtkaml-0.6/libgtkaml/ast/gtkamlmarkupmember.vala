@@ -23,7 +23,8 @@ public class Gtkaml.Ast.MarkupMember : MarkupChildTag {
 	}
 	
 	public override MarkupTag? resolve (MarkupResolver resolver) throws ParseError {
-		return base.resolve (resolver);
+		resolver.visit_data_type (data_type);
+		return this;
 	}
 	
 	public override void generate (MarkupResolver resolver) throws ParseError {
@@ -53,8 +54,7 @@ public class Gtkaml.Ast.MarkupMember : MarkupChildTag {
 		markup_class.add_property (p);
 	}
 	
-	private void generate_construct_member (MarkupResolver resolver) throws ParseError 
-	{
+	private void generate_construct_member (MarkupResolver resolver) throws ParseError {
 		var initializer = get_initializer (resolver);
 		var assignment = new Assignment (new MemberAccess.simple (me, source_reference), initializer, AssignmentOperator.SIMPLE, source_reference);
 		

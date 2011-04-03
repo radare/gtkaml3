@@ -1,31 +1,23 @@
-AM_CFLAGS = \
-	 -Wall \
-	 -g \
-	 $(EXTRA_CFLAGS) \
-	 $(GTK_CFLAGS)
-
-BUILT_SOURCES = basic_container_add_test.stamp 
-noinst_PROGRAMS = basic_container_add_test 
+ALL = basic_container_add_test test6 test7 test8 test9
 
 
-CLEANFILES = basic_container_add_test.h basic_container_add_test.c basic_container_add_test.stamp basic_container_add_test.vala
+all: $(ALL)
 
-## Basic feature test: container adds, expressions in properties and signals
-basic_container_add_test_GTKAMLSOURCES = \
-	basic_container_add_test.gtkaml
+basic_container_add_test : $@.gtkaml
+	$(top_srcdir)/src/gtkamlc $(VALAFLAGS) --pkg gtk+-2.0 $@.gtkaml --dump-tree $@.vala
 
-nodist_basic_container_add_test_SOURCES = \
-	$(basic_container_add_test_GTKAMLSOURCES:.gtkaml=.c) \
-	$(basic_container_add_test_GTKAMLSOURCES:.gtkaml=.h) \
-	basic_container_add_test.stamp	
+test6 : $@.gtkaml
+	$(top_srcdir)/src/gtkamlc $(VALAFLAGS) --pkg gtk+-2.0 $@.gtkaml --dump-tree $@.vala
 
-basic_container_add_test_LDADD = \
-	$(GTK_LIBS) \
-	$(EXTRA_LDFLAGS)
+test7 : $@.gtkaml
+	$(top_srcdir)/src/gtkamlc $(VALAFLAGS) --pkg gtk+-2.0 $@.gtkaml --dump-tree $@.vala
 
-basic_container_add_test.stamp : $(basic_container_add_test_GTKAMLSOURCES)
-	$(top_srcdir)/src/gtkamlc -C $(VALAFLAGS) --pkg gtk+-2.0 $^ --dump-tree basic_container_add_test.vala
+test8 : $@.gtkaml
+	$(top_srcdir)/src/gtkamlc $(VALAFLAGS) --pkg gtk+-2.0 $@.gtkaml --dump-tree $@.vala
+
+test9 : $@.gtkaml
+	$(top_srcdir)/src/gtkamlc $(VALAFLAGS) --pkg gtk+-2.0 $@.gtkaml --dump-tree $@.vala
 
 
-EXTRA_DIST = \
-	$(basic_container_add_test_GTKAMLSOURCES)
+clean:
+	rm $(ALL)

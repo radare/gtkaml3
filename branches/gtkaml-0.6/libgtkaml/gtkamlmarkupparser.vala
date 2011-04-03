@@ -1,15 +1,20 @@
 using GLib;
 using Vala;
 using Xml;
+using Gtkaml.Ast;
 
+/**
+ * Gtkaml Parser
+ */
 public class Gtkaml.MarkupParser : CodeVisitor {
 
 	private CodeContext context;
-	public ValaParser vala_parser;
+	
+	public ValaParser code_parser {get; private set;}
 
-	public Vala.List<string> identifier_attributes;
-	public Vala.List<string> classname_attributes;
-	public Vala.List<string> parsetime_attributes;
+	Vala.List<string> identifier_attributes;
+	Vala.List<string> classname_attributes;
+	Vala.List<string> parsetime_attributes;
 
 	
 	public MarkupParser () 
@@ -20,7 +25,7 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 
 	public void parse (CodeContext context) {
 		this.context = context;
-		this.vala_parser = new ValaParser (context);
+		this.code_parser = new ValaParser (context); //TODO move this per class or per source file
 		context.accept (this);
 	}
 	
@@ -176,8 +181,8 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 	}		
 
 	void parse_gtkaml_tag (MarkupScanner scanner, MarkupTag parent_tag) {
-		//TODO gtkaml:construct, preconstruct and .. any other?
-		message ("found gtkaml tag %s".printf (scanner.node->name)); //TODO
+		//TODO gtkaml:construct, preconstruct etc
+		warning ("Igonring gtkaml tag %s".printf (scanner.node->name)); //TODO
 	}
 	
 	void init_attribute_lists () {

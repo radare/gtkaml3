@@ -4,7 +4,7 @@ using Vala;
 /**
  * Represents a tag with g:private or g:public which will be declared as a class member
  */
-public class Gtkaml.MarkupMember : MarkupChildTag {
+public class Gtkaml.Ast.MarkupMember : MarkupChildTag {
 
 	protected string member_name { get; private set; }
 	protected SymbolAccessibility access {get; private set;}

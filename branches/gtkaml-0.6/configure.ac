@@ -1,4 +1,4 @@
-AC_INIT([gtkaml],[0.3.91])
+AC_INIT([gtkaml],[0.5.91])
 
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 AM_CONFIG_HEADER(config.h)
@@ -42,7 +42,7 @@ AC_SUBST(VALA_LIBS)
 
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 
-AC_ARG_ENABLE([docs], ([--enable-docs],[enable to generate valadoc]),
+AC_ARG_ENABLE([docs], AS_HELP_STRING([--enable-docs],[use this to generate valadoc]),
               [enable_docs=$enableval], [enable_docs=no])
 AM_CONDITIONAL([ENABLE_DOCS], [test x$enable_docs = xyes])
 

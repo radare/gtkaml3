@@ -1,7 +1,7 @@
 using GLib;
 using Vala;
 
-public class Gtkaml.MarkupRoot : MarkupTag {
+public class Gtkaml.Ast.MarkupRoot : MarkupTag {
 
 	public MarkupRoot (MarkupClass markup_class, string tag_name, MarkupNamespace tag_namespace, SourceReference? source_reference = null) {
 		base (markup_class, tag_name, tag_namespace, source_reference);
@@ -43,7 +43,7 @@ public class Gtkaml.MarkupRoot : MarkupTag {
 
 
 	private void parse_class_members (MarkupParser parser, string source) throws ParseError {
-		var temp_class = parser.vala_parser.parse_members (markup_class, source);
+		var temp_class = parser.code_parser.parse_members (markup_class, source);
 		foreach (var x in temp_class.get_constants ()) { markup_class.add_constant (x); };
 		foreach (var x in temp_class.get_fields ()) { markup_class.add_field (x); };
 		foreach (var x in temp_class.get_methods ()) {

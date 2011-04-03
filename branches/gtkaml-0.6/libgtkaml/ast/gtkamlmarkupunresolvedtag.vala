@@ -5,7 +5,7 @@ using Vala;
  * Any markup tag encountered in XML that is not the root, nor has g:public/g:private identifier.
  * Can later morph into a complex attribute or into a temp
  */
-public class Gtkaml.MarkupUnresolvedTag : MarkupChildTag {
+public class Gtkaml.Ast.MarkupUnresolvedTag : MarkupChildTag {
 
 	public override string me { get { assert_not_reached(); } }
 	

@@ -1,6 +1,6 @@
 
 if ENABLE_DOCS
-    VALADOC_COMMAND=$(VALADOC) -o ../valaddoc -b $(top_srcdir) --pkg libvala-$(VALA_VERSION) --pkg libxml-2.0 --force --doclet=devhelp $^ 
+    VALADOC_COMMAND=$(VALADOC) -o ../valadoc -b $(top_srcdir) --pkg libvala-$(VALA_VERSION) --pkg libxml-2.0 --force --doclet=devhelp --package-name=Gtkaml --package-version=$(PACKAGE_VERSION) $^ 
 else
     VALADOC_COMMAND=
 endif

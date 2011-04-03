@@ -1,7 +1,10 @@
 using GLib;
 using Vala;
 
-//TODO: make ValaParser markup-class dependent?
+//TODO: make ValaParser markup-class dependent? or file dependent?
+/**
+ * Vala.Parser wrapper
+ */
 public class Gtkaml.ValaParser {
 	
 	protected CodeContext real_context;
@@ -11,6 +14,9 @@ public class Gtkaml.ValaParser {
 		this.real_context = real_context;
 	}
 
+	/**
+	 * parses CDATA code containing class members
+	 */
 	public Class parse_members (MarkupClass markup_class, string members_source) throws ParseError  {
 		string class_name = markup_class.name;
 		var temp_source = "public class %s { %s }".printf (class_name, members_source);
@@ -23,6 +29,9 @@ public class Gtkaml.ValaParser {
 		}
 	}
 	
+	/**
+	 * parses an attribute value that is coded as an expression
+	 */
 	public Expression parse_expression (MarkupClass markup_class, string target, string target_member, string expression_source) throws ParseError {
 		string class_name = markup_class.name;
 		var temp_source = "VoidFunc voidFunc = ()=> %s;".printf (expression_source);
@@ -36,6 +45,9 @@ public class Gtkaml.ValaParser {
 		}
 	}
 	
+	/**
+	 * parses a signal value that is coded as an expression
+	 */
 	public Block parse_statements (MarkupClass markup_class, string target, string target_member, string statements_source) throws ParseError {
 		string class_name = markup_class.name;
 		var temp_source = "VoidFunc voidFunc = ()=> {%s};".printf (statements_source);

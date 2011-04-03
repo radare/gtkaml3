@@ -9,7 +9,7 @@ using Vala;
  * * (optionally) resolve
  * * generate
  */ 
-public abstract class Gtkaml.MarkupTag : Object {
+public abstract class Gtkaml.Ast.MarkupTag : Object {
 	
 	protected Vala.List<MarkupChildTag> child_tags = new Vala.ArrayList<MarkupChildTag> ();
 	protected Vala.List<MarkupAttribute> markup_attributes = new Vala.ArrayList<MarkupAttribute> ();

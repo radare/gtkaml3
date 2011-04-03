@@ -1,6 +1,7 @@
 using GLib;
 using Vala;
 
+using Gtkaml.Ast;
 /**
  * Represents a Class as declared by a Gtkaml root node
  */

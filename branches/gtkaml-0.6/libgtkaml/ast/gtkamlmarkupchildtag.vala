@@ -5,7 +5,7 @@ using Vala;
  * MarkupChildTag is a MarkupTag that has itself a parent: 
  * parent_tag, and g:existing, g:standalone, g:construct, g:private etc.
  */
-public abstract class Gtkaml.MarkupChildTag : MarkupTag {
+public abstract class Gtkaml.Ast.MarkupChildTag : MarkupTag {
 
 	public weak MarkupTag parent_tag {get;set;}
 

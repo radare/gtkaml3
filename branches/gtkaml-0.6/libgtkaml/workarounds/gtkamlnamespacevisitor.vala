@@ -1,13 +1,10 @@
 using GLib;
 using Vala;
 
-///
-/// Workaround just to enumerate using directives
-
-public class Gtkaml.NamespaceVisitor : CodeVisitor {
-	private List<UsingDirective> using_directives = new ArrayList<UsingDirective> ();
+class Gtkaml.NamespaceVisitor : CodeVisitor {
+	private Vala.List<UsingDirective> using_directives = new ArrayList<UsingDirective> ();
 	
-	public List<UsingDirective> get_using_directives () {
+	public Vala.List<UsingDirective> get_using_directives () {
 		return using_directives;
 	}
 	

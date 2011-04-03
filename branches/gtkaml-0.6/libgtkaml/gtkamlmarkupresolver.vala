@@ -1,26 +1,20 @@
 using GLib;
 using Vala;
+using Gtkaml.Ast;
 
 /**
- * Gtkaml SymbolResolver's  responsibilities:
- * * determine if an attribute is a field or a signal and use = or += appropiately
- * Literal attribute values:
- * * determine the type of the literal field attribute (boolean, string and enum)
- * * determine the method reference for the literal signal attribute
- * Expression attribute values:
- * * signals: use the result of lambda parsing add the signal parameters
- * * fields: use the expression of the lambda as field assignment
+ * Gtkaml SymbolResolver
  */
 public class Gtkaml.MarkupResolver : SymbolResolver {
 
 	public MarkupHintsStore markup_hints;
-	public ValaParser vala_parser;
+	public ValaParser code_parser {get; private set;}
 
 	internal CodeContext context {get; set;}
 
 	public void resolve (CodeContext context) {
 		markup_hints = new MarkupHintsStore (context);
-		vala_parser = new ValaParser (context);
+		code_parser = new ValaParser (context); //TODO move this per class
 		markup_hints.parse ();
 		this.context = context;
 		base.resolve (context);
@@ -33,6 +27,9 @@ public class Gtkaml.MarkupResolver : SymbolResolver {
 		base.visit_class (cl);
 	}
 	
+	/**
+	 * executes before base.visit_class, triggers resolving and generating of tags
+	 */
 	public void visit_markup_class (MarkupClass mcl) {
 		try {
 			resolve_markup_tag (mcl.markup_root);
@@ -42,6 +39,9 @@ public class Gtkaml.MarkupResolver : SymbolResolver {
 		}
 	}
 	
+	/**
+	 * looks up a memeber in the type hierarchy and returns its symbol
+	 */
 	public Symbol? search_symbol (ObjectTypeSymbol type, string sym_name)
 	{
 		Symbol? sym = type.scope.lookup (sym_name);
@@ -67,9 +67,9 @@ public class Gtkaml.MarkupResolver : SymbolResolver {
 	}
 	
 	/**
-	 * processes tag hierarchy. Removes unresolved ones after this step
+	 * processes tag hierarchy. Unresolved tags are removed after this step
 	 */
-	public bool resolve_markup_tag (MarkupTag markup_tag) throws ParseError {
+	protected bool resolve_markup_tag (MarkupTag markup_tag) throws ParseError {
 		//resolve first
 		MarkupTag? resolved_tag = markup_tag.resolve (this);
 		
@@ -92,13 +92,19 @@ public class Gtkaml.MarkupResolver : SymbolResolver {
 		return resolved_tag != null;
 	}
 
-	private void generate_markup_tag (MarkupTag markup_tag) throws ParseError {
+	/**
+	 * processes tag hierarchy, calling generate () on each, then recurses, then generate_attributes () 
+	 */
+	protected void generate_markup_tag (MarkupTag markup_tag) throws ParseError {
 		markup_tag.generate (this);
 		foreach (MarkupTag child_tag in markup_tag.get_child_tags ())
 			generate_markup_tag (child_tag);
 		markup_tag.generate_attributes (this);
 	}
-		
+	
+	/** 
+	 * returns parameters of a Callable as a list of MarkupAttributes with name, type and default value if one exists as markup hints
+	 */	
 	public Vala.List<MarkupAttribute> get_default_parameters (string full_type_name, Callable m, SourceReference? source_reference = null) {
 		var parameters = new Vala.ArrayList<MarkupAttribute> ();
 		var hint = markup_hints.markup_hints.get (full_type_name);
@@ -132,6 +138,9 @@ public class Gtkaml.MarkupResolver : SymbolResolver {
 		return parameters;
 	}	
 
+	/**
+	 * returns the list of methods that can be used to add child tags for the current type, and its base types
+	 */
 	public Vala.List<Callable> get_composition_method_candidates (TypeSymbol parent_tag_symbol) {
 		Vala.List<Callable> candidates = new Vala.ArrayList<Callable> ();
 		#if DEBUGMARKUPHINTS
@@ -164,8 +173,10 @@ public class Gtkaml.MarkupResolver : SymbolResolver {
 		return candidates;
 	}
 	
-	/** returns method or signal */
-	private Symbol? search_method_or_signal (TypeSymbol type, string name) {
+	/** 
+	 * returns method or signal 
+	 */
+	protected Symbol? search_method_or_signal (TypeSymbol type, string name) {
 		#if DEBUGMARKUPHINTS
 		stderr.printf ("\rsearching %s in %s..", name, type.name);
 		#endif

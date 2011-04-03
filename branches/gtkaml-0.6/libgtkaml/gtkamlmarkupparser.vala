@@ -50,13 +50,27 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 	void parse_markup_class (MarkupScanner scanner) throws ParseError {
 		
 		MarkupNamespace base_ns = parse_namespace (scanner);
-		string class_name = parse_identifier (scanner.node->get_ns_prop ("name", scanner.gtkaml_uri));
+		SymbolAccessibility access = SymbolAccessibility.PUBLIC;
+		string class_name = null;
+		
+		foreach (var classname_attribute in classname_attributes) {
+			if (scanner.node->get_ns_prop (classname_attribute, scanner.gtkaml_uri) != null)
+			{
+				if (class_name != null) throw new ParseError.SYNTAX	("Cannot specify more than one of: internal, public, name");
+				class_name = parse_identifier (scanner.node->get_ns_prop (classname_attribute, scanner.gtkaml_uri));
+				switch (classname_attributes.index_of (classname_attribute)) {
+					case 0: access = SymbolAccessibility.PUBLIC;break;
+					case 1: access = SymbolAccessibility.INTERNAL;break;
+					case 2: access = SymbolAccessibility.PUBLIC;break;
+				}
+			}
+		}
+
 		string base_name = parse_identifier (scanner.node->name);
 
 		MarkupClass markup_class = new MarkupClass (base_name, base_ns, class_name, scanner.get_src ());
 
-		//TODO: set markupClass access to internal or public
-		markup_class.access = SymbolAccessibility.PUBLIC;
+		markup_class.access = access;
 
 		//TODO: create another NS in lieu of target_namespace
 		Namespace target_namespace = context.root;
@@ -222,16 +236,21 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 		identifier_attributes.add ("public");
 		
 		classname_attributes = new ArrayList<string> (GLib.str_equal);
-		classname_attributes.add ("public");
-		classname_attributes.add ("internal");
 		classname_attributes.add ("name");
+		classname_attributes.add ("internal");
+		classname_attributes.add ("public");
 
 		parsetime_attributes = new ArrayList<string> (GLib.str_equal);
+
 		foreach (var a in identifier_attributes)
 			parsetime_attributes.add (a);
+
 		foreach (var a in classname_attributes)
 			parsetime_attributes.add (a);
+
 		parsetime_attributes.add ("existing");
+		parsetime_attributes.add ("standalone");
+
 	}
 		
 }

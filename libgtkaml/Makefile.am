@@ -42,6 +42,7 @@ libgtkaml_la_VALASOURCES = \
 	ast/gtkamlmarkupunresolvedtag.vala \
 	ast/gtkamlmarkupmember.vala \
 	ast/gtkamlmarkuptemp.vala \
+	ast/gtkamlmarkupreference.vala \
 	gtkamlmarkupnamespace.vala \
 	gtkamlmarkuphint.vala \
 	gtkamlmarkuphintsstore.vala \

@@ -148,9 +148,14 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 		SymbolAccessibility accessibility = SymbolAccessibility.PUBLIC;
 
 		string identifier = parse_markup_subtag_identifier (scanner, ref accessibility);
+		string reference = parse_markup_subtag_reference (scanner);
 
 		if (identifier != null) {
-			markup_tag = new MarkupMember (parent_tag, scanner.node->name, parse_namespace (scanner), identifier, accessibility, scanner.get_src ());			
+			if (reference != null)
+				throw new ParseError.SYNTAX ("Cannot specify both an existing identifier and a new one");
+			markup_tag = new MarkupMember (parent_tag, scanner.node->name, parse_namespace (scanner), identifier, accessibility, scanner.get_src ());
+		} else if (reference != null) {
+			markup_tag = new MarkupReference (parent_tag, scanner.node->name, parse_namespace (scanner), reference, scanner.get_src ());
 		} else {
 			if (scanner.node->properties != null) { //has attributes
 				markup_tag = new MarkupTemp (parent_tag, scanner.node->name, parse_namespace (scanner), scanner.get_src ());
@@ -181,6 +186,15 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 		return identifier;
 	}		
 
+	string parse_markup_subtag_reference (MarkupScanner scanner) throws ParseError {
+		string reference = scanner.node->get_ns_prop ("existing", scanner.gtkaml_uri);
+		if (reference != null) {
+			return parse_identifier (reference);
+		} else {
+			return null;
+		}
+	}		
+
 	void parse_gtkaml_tag (MarkupScanner scanner, MarkupTag parent_tag) {
 		//TODO gtkaml:construct, preconstruct etc
 		warning ("Igonring gtkaml tag %s".printf (scanner.node->name)); //TODO
@@ -203,6 +217,7 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 			parsetime_attributes.add (a);
 		foreach (var a in classname_attributes)
 			parsetime_attributes.add (a);
+		parsetime_attributes.add ("existing");
 	}
 		
 }

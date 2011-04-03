@@ -66,7 +66,6 @@ public class Gtkaml.Ast.MarkupRoot : MarkupTag {
 
 	/**
 	 * generate creation method with base () call
-	 * FIXME currently ran at resolve time
 	 */
 	private void generate_creation_method (MarkupResolver resolver) {
 		CreationMethod creation_method = new CreationMethod(markup_class.name, null, markup_class.source_reference);

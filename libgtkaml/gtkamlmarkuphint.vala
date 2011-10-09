@@ -89,7 +89,7 @@ public class Gtkaml.MarkupHint {
 	}
 }
 
-class Gtkaml.Pair<K,V> {
+public class Gtkaml.Pair<K,V> {
 	public K name;
 	public V value;
 	public Pair (owned K name, owned V value) {

@@ -18,9 +18,9 @@
   private Widget find_button;
 
   public SearchDialog () {
-    add_button (STOCK_HELP, ResponseType.HELP);
-    add_button (STOCK_CLOSE, ResponseType.CLOSE);
-    this.find_button = add_button (STOCK_FIND, ResponseType.APPLY);
+    add_button (Stock.HELP, ResponseType.HELP);
+    add_button (Stock.CLOSE, ResponseType.CLOSE);
+    this.find_button = add_button (Stock.FIND, ResponseType.APPLY);
     this.find_button.sensitive = false;
   }
 

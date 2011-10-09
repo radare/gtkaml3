@@ -46,6 +46,10 @@ public class Gtkaml.Ast.MarkupRoot : MarkupTag {
 
 
 	private void parse_class_members (MarkupParser parser, string source) throws ParseError {
+		
+		if (markup_class.scope.lookup(".new") != null) 
+			Report.warning (null, "Wait wat?");
+		
 		var temp_class = parser.code_parser.parse_members (markup_class, source);
 		foreach (var x in temp_class.get_constants ()) { markup_class.add_constant (x); };
 		foreach (var x in temp_class.get_fields ()) { markup_class.add_field (x); };
@@ -53,7 +57,11 @@ public class Gtkaml.Ast.MarkupRoot : MarkupTag {
 			if (!(x is CreationMethod && ((CreationMethod)x).name == ".new"))  {
 				markup_class.add_method (x);
 			} else {
-				Report.warning (null, "BUG: Ignoring %s () creation member".printf (markup_class.name));
+				if (x.body != null && x.body.get_statements ().size > 0) {
+					//custom creation method
+					x.name = null;
+					markup_class.add_method (x);
+				}
 			}
 		}
 		foreach (var x in temp_class.get_properties ()) { markup_class.add_property (x); };
@@ -68,6 +76,12 @@ public class Gtkaml.Ast.MarkupRoot : MarkupTag {
 	 * generate creation method with base () call
 	 */
 	private void generate_creation_method (MarkupResolver resolver) {
+		
+		if (markup_class.default_construction_method != null) {
+			//already present
+			return;
+		}
+		
 		CreationMethod creation_method = new CreationMethod(markup_class.name, null, markup_class.source_reference);
 		creation_method.access = SymbolAccessibility.PUBLIC;
 		

@@ -12,9 +12,9 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 	
 	public ValaParser code_parser {get; private set;}
 
-	Vala.List<string> identifier_attributes;
-	Vala.List<string> classname_attributes;
-	Vala.List<string> parsetime_attributes;
+	Vala.List<string> identifier_gtkamlattributes;
+	Vala.List<string> classname_gtkamlattributes;
+	Vala.List<string> parsed_gtkamlattributes;
 
 	
 	public MarkupParser () 
@@ -53,12 +53,12 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 		SymbolAccessibility access = SymbolAccessibility.PUBLIC;
 		string class_name = null;
 		
-		foreach (var classname_attribute in classname_attributes) {
+		foreach (var classname_attribute in classname_gtkamlattributes) {
 			if (scanner.node->get_ns_prop (classname_attribute, scanner.gtkaml_uri) != null)
 			{
 				if (class_name != null) throw new ParseError.SYNTAX	("Cannot specify more than one of: internal, public, name");
 				class_name = parse_identifier (scanner.node->get_ns_prop (classname_attribute, scanner.gtkaml_uri));
-				switch (classname_attributes.index_of (classname_attribute)) {
+				switch (classname_gtkamlattributes.index_of (classname_attribute)) {
 					case 0: access = SymbolAccessibility.PUBLIC;break;
 					case 1: access = SymbolAccessibility.INTERNAL;break;
 					case 2: access = SymbolAccessibility.PUBLIC;break;
@@ -116,9 +116,18 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 				parse_attribute (markup_tag, attr->name, attr->children->content);
 			} else {
 				if (attr->ns->href == scanner.gtkaml_uri) {
-					if (!parsetime_attributes.contains (attr->name)) {
-						//TODO add them there
-						Report.warning (scanner.get_src (), "Attribute %s:%s ingored".printf (attr->ns->prefix, attr->name));
+					if (!parsed_gtkamlattributes.contains (attr->name)) {
+						switch (attr->name) {
+							case "construct":
+								parse_construct (markup_tag, attr->children->content);
+								break;
+							case "preconstruct":
+								parse_preconstruct (markup_tag, attr->children->content);
+								break;
+							default:
+								Report.warning (scanner.get_src (), "Attribute %s:%s ignored".printf (attr->ns->prefix, attr->name));
+								break;
+						}
 					}
 				} else {
 					throw new ParseError.SYNTAX ("Attribute prefix not expected: %s".printf (attr->ns->href));
@@ -137,7 +146,8 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 		string text = "";
 		for (Xml.Node* node = scanner.node->children; node != null; node = node->next)
 		{
-			if (node->type != ElementType.CDATA_SECTION_NODE && node->type != ElementType.TEXT_NODE) continue;//TODO break?
+			if (node->type != ElementType.CDATA_SECTION_NODE && node->type != ElementType.TEXT_NODE) 
+				continue;//TODO break?
 			text += node->content + "\n";
 		}
 		return text.chomp ();
@@ -191,12 +201,12 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 		
 		string identifier = null;
 		
-		foreach (var identifier_attribute in identifier_attributes) {
+		foreach (var identifier_attribute in identifier_gtkamlattributes) {
 			if (scanner.node->get_ns_prop (identifier_attribute, scanner.gtkaml_uri) != null) {
 				if (identifier != null) 
 					throw new ParseError.SYNTAX ("Cannot specify more than one of: private, protected, internal, public");
 				identifier = parse_identifier (scanner.node->get_ns_prop (identifier_attribute, scanner.gtkaml_uri));
-				accessibility = (SymbolAccessibility)identifier_attributes.index_of (identifier_attribute);
+				accessibility = (SymbolAccessibility)identifier_gtkamlattributes.index_of (identifier_attribute);
 			} 
 		}		
 		return identifier;
@@ -223,33 +233,58 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 		}
 	}		
 
-	void parse_gtkaml_tag (MarkupScanner scanner, MarkupTag parent_tag) {
-		//TODO gtkaml:construct, preconstruct etc
-		warning ("Igonring gtkaml tag %s".printf (scanner.node->name)); //TODO
+	void parse_gtkaml_tag (MarkupScanner scanner, MarkupTag parent_tag) throws ParseError {
+		switch (scanner.node->name) {
+			case "construct":
+				parse_construct (parent_tag, parse_text (scanner));
+				break;
+			case "preconstruct":
+				parse_preconstruct (parent_tag, parse_text (scanner));
+				break;
+			default:
+				Report.warning (parent_tag.source_reference, "Ignoring gtkaml tag %s".printf (scanner.node->name));
+				break;
+		}
+	}
+	
+	void parse_construct (MarkupTag markup_tag, string construct_body) throws ParseError {
+		if (markup_tag.construct_text != null) {
+			throw new ParseError.SYNTAX ("Duplicate `construct' definition on %s".printf (markup_tag.me));
+		} else {
+			markup_tag.construct_text = construct_body;
+		}
+	}
+
+	void parse_preconstruct (MarkupTag markup_tag, string preconstruct_body) throws ParseError {
+		if (markup_tag.preconstruct_text != null) {
+			throw new ParseError.SYNTAX ("Duplicate `preconstruct' definition on %s".printf (markup_tag.me));
+		} else {
+			markup_tag.preconstruct_text = preconstruct_body;
+		}
 	}
 	
 	void init_attribute_lists () {
-		identifier_attributes = new ArrayList<string> (GLib.str_equal);
-		identifier_attributes.add ("private");
-		identifier_attributes.add ("internal");
-		identifier_attributes.add ("protected");
-		identifier_attributes.add ("public");
+		identifier_gtkamlattributes = new ArrayList<string> (GLib.str_equal);
+		identifier_gtkamlattributes.add ("private");
+		identifier_gtkamlattributes.add ("internal");
+		identifier_gtkamlattributes.add ("protected");
+		identifier_gtkamlattributes.add ("public");
 		
-		classname_attributes = new ArrayList<string> (GLib.str_equal);
-		classname_attributes.add ("name");
-		classname_attributes.add ("internal");
-		classname_attributes.add ("public");
+		classname_gtkamlattributes = new ArrayList<string> (GLib.str_equal);
+		classname_gtkamlattributes.add ("name");
+		classname_gtkamlattributes.add ("internal");
+		classname_gtkamlattributes.add ("public");
 
-		parsetime_attributes = new ArrayList<string> (GLib.str_equal);
+		parsed_gtkamlattributes = new ArrayList<string> (GLib.str_equal);
 
-		foreach (var a in identifier_attributes)
-			parsetime_attributes.add (a);
+		foreach (var a in identifier_gtkamlattributes)
+			parsed_gtkamlattributes.add (a);
 
-		foreach (var a in classname_attributes)
-			parsetime_attributes.add (a);
+		foreach (var a in classname_gtkamlattributes)
+			parsed_gtkamlattributes.add (a);
 
-		parsetime_attributes.add ("existing");
-		parsetime_attributes.add ("standalone");
+		parsed_gtkamlattributes.add ("existing");
+		parsed_gtkamlattributes.add ("standalone");
 
 	}
 		

@@ -37,6 +37,13 @@ public abstract class Gtkaml.Ast.MarkupChildTag : MarkupTag {
 		resolve_composition_method (resolver);
 	}
 
+	public override void generate (MarkupResolver resolver) throws ParseError {
+		generate_preconstruct (resolver);
+		generate_add (resolver);
+		generate_construct (resolver);
+	}
+
+
 	/**
 	 * determines the composition method to use, setting `composition_method` and `composition_parameters`
 	 */
@@ -201,6 +208,24 @@ public abstract class Gtkaml.Ast.MarkupChildTag : MarkupTag {
 		}
 		
 		markup_class.constructor.body.add_statement (new ExpressionStatement (method_call, source_reference));
+	}
+
+	protected void generate_preconstruct (MarkupResolver resolver) throws ParseError
+	{
+		if (preconstruct_text != null) {
+			var stmts = resolver.code_parser.parse_statements (this.markup_class, this.me, "_preconstruct", preconstruct_text);
+			foreach (var stmt in stmts.get_statements ())
+				markup_class.constructor.body.add_statement (stmt);
+		}
+	}
+
+	protected void generate_construct (MarkupResolver resolver) throws ParseError
+	{
+		if (construct_text != null) {
+			var stmts = resolver.code_parser.parse_statements (this.markup_class, this.me, "_construct", construct_text);
+			foreach (var stmt in stmts.get_statements ())
+				markup_class.constructor.body.add_statement (stmt);
+		}
 	}
 
 }

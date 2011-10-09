@@ -36,6 +36,8 @@ class Gtkaml.Compiler {
 	static string[] vapi_directories;
 	[CCode (array_length = false, array_null_terminated = true)]
 	static string[] gir_directories;
+	[CCode (array_length = false, array_null_terminated = true)]
+	static string[] metadata_directories;
 	static string vapi_filename;
 	static string library;
 	static string gir;
@@ -63,7 +65,6 @@ class Gtkaml.Compiler {
 	static bool deprecated;
 	static bool experimental;
 	static bool experimental_non_null;
-	static bool disable_dbus_transformation;
 	static bool disable_warnings;
 	static string cc_command;
 	[CCode (array_length = false, array_null_terminated = true)]
@@ -90,6 +91,8 @@ class Gtkaml.Compiler {
 	const OptionEntry[] options = {
 		{ "girdir", 0, 0, OptionArg.FILENAME_ARRAY, ref gir_directories, "Look for .gir files in DIRECTORY", "DIRECTORY..." },
 		{ "vapidir", 0, 0, OptionArg.FILENAME_ARRAY, ref vapi_directories, "Look for package bindings in DIRECTORY", "DIRECTORY..." },
+		{ "girdir", 0, 0, OptionArg.FILENAME_ARRAY, ref gir_directories, "Look for .gir files in DIRECTORY", "DIRECTORY..." },
+		{ "metadatadir", 0, 0, OptionArg.FILENAME_ARRAY, ref metadata_directories, "Look for GIR .metadata files in DIRECTORY", "DIRECTORY..." },
 		{ "pkg", 0, 0, OptionArg.STRING_ARRAY, ref packages, "Include binding for PACKAGE", "PACKAGE..." },
 		{ "vapi", 0, 0, OptionArg.FILENAME, ref vapi_filename, "Output VAPI file name", "FILE" },
 		{ "library", 0, 0, OptionArg.STRING, ref library, "Library name", "NAME" },
@@ -122,7 +125,6 @@ class Gtkaml.Compiler {
 		{ "disable-warnings", 0, 0, OptionArg.NONE, ref disable_warnings, "Disable warnings", null },
 		{ "fatal-warnings", 0, 0, OptionArg.NONE, ref fatal_warnings, "Treat warnings as fatal", null },
 		{ "enable-experimental-non-null", 0, 0, OptionArg.NONE, ref experimental_non_null, "Enable experimental enhancements for non-null types", null },
-		{ "disable-dbus-transformation", 0, 0, OptionArg.NONE, ref disable_dbus_transformation, "Disable transformation of D-Bus member names", null },
 		{ "cc", 0, 0, OptionArg.STRING, ref cc_command, "Use COMMAND as C compiler command", "COMMAND" },
 		{ "Xcc", 'X', 0, OptionArg.STRING_ARRAY, ref cc_options, "Pass OPTION to the C compiler", "OPTION..." },
 		{ "dump-tree", 0, 0, OptionArg.FILENAME, ref dump_tree, "Write code tree to FILE", "FILE" },
@@ -173,7 +175,6 @@ class Gtkaml.Compiler {
 		context.deprecated = deprecated;
 		context.experimental = experimental;
 		context.experimental_non_null = experimental_non_null;
-		context.dbus_transformation = !disable_dbus_transformation;
 		context.report.enable_warnings = !disable_warnings;
 		context.report.set_verbose_errors (!quiet_mode);
 		context.verbose_mode = verbose_mode;
@@ -202,6 +203,7 @@ class Gtkaml.Compiler {
 		}
 		context.vapi_directories = vapi_directories;
 		context.gir_directories = gir_directories;
+		context.metadata_directories = metadata_directories;
 		context.debug = debug;
 		context.thread = thread;
 		context.mem_profiler = mem_profiler;
@@ -232,7 +234,7 @@ class Gtkaml.Compiler {
 			}
 		}
 
-		for (int i = 2; i <= 12; i += 2) {
+		for (int i = 2; i <= 16; i += 2) {
 			context.add_define ("VALA_0_%d".printf (i));
 		}
 
@@ -273,9 +275,6 @@ class Gtkaml.Compiler {
 		if (packages != null) {
 			foreach (string package in packages) {
 				context.add_external_package (package);
-				if (context.profile == Profile.GOBJECT && package == "dbus-glib-1") {
-					context.add_define ("DBUS_GLIB");
-				}
 			}
 			packages = null;
 		}
@@ -293,14 +292,7 @@ class Gtkaml.Compiler {
 		}
 
 		if (context.profile == Profile.GOBJECT) {
-			if (context.has_package ("dbus-glib-1")) {
-				if (!context.deprecated) {
-					Report.warning (null, "D-Bus GLib is deprecated, use GDBus");
-				}
-				context.codegen = new DBusServerModule ();
-			} else {
-				context.codegen = new GDBusServerModule ();
-			}
+			context.codegen = new GDBusServerModule ();
 		} else if (context.profile == Profile.DOVA) {
 			context.codegen = new DovaErrorModule ();
 		} else {

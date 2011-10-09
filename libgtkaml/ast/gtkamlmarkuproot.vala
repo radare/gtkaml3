@@ -46,10 +46,6 @@ public class Gtkaml.Ast.MarkupRoot : MarkupTag {
 
 
 	private void parse_class_members (MarkupParser parser, string source) throws ParseError {
-		
-		if (markup_class.scope.lookup(".new") != null) 
-			Report.warning (null, "Wait wat?");
-		
 		var temp_class = parser.code_parser.parse_members (markup_class, source);
 		foreach (var x in temp_class.get_constants ()) { markup_class.add_constant (x); };
 		foreach (var x in temp_class.get_fields ()) { markup_class.add_field (x); };

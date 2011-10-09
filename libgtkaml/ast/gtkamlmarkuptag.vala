@@ -59,6 +59,10 @@ public abstract class Gtkaml.Ast.MarkupTag : Object {
 		}
 	}
 
+	public string construct_text;
+	
+	public string preconstruct_text;
+
 	private string _full_name;
 
 	/**
@@ -82,6 +86,7 @@ public abstract class Gtkaml.Ast.MarkupTag : Object {
 		this.tag_name = tag_name;
 		this.tag_namespace = tag_namespace;
 		this.source_reference = source_reference;
+		this.construct_text = this.preconstruct_text = null;
 		
 		this.data_type = new UnresolvedType.from_symbol (new UnresolvedSymbol (tag_namespace, tag_name, source_reference));
 		this.data_type.value_owned = true;

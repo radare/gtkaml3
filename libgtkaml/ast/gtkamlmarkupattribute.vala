@@ -35,7 +35,7 @@ public class Gtkaml.Ast.MarkupAttribute {
 			if (stripped_value.has_suffix ("}")) {
 				string code_source = stripped_value.substring (1, stripped_value.length - 2);
 				if (_signal != null) {
-					var stmts = resolver.code_parser.parse_statements (markup_tag.markup_class, markup_tag.me, attribute_name, code_source + ";");
+					var stmts = resolver.code_parser.parse_statements (markup_tag.markup_class, markup_tag.me, attribute_name, code_source);
 					var lambda = new LambdaExpression.with_statement_body(stmts, source_reference);
 
 					lambda.add_parameter (new Vala.Parameter ("target", markup_tag.data_type, markup_tag.source_reference));

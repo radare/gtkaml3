@@ -50,7 +50,7 @@ public class Gtkaml.ValaParser {
 	 */
 	public Block parse_statements (MarkupClass markup_class, string target, string target_member, string statements_source) throws ParseError {
 		string class_name = markup_class.name;
-		var temp_source = "VoidFunc voidFunc = ()=> {%s};".printf (statements_source);
+		var temp_source = "VoidFunc voidFunc = ()=> {%s;};".printf (statements_source);
 		
 		var temp_ns = parse (markup_class.source_reference.file, temp_source, class_name + "_" + target + "_" + target_member + "_expression");
 		if (temp_ns is Namespace && temp_ns.get_fields ().size == 1 && temp_ns.get_fields ().get (0).initializer is LambdaExpression) {

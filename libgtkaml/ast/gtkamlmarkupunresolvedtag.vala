@@ -19,22 +19,26 @@ public class Gtkaml.Ast.MarkupUnresolvedTag : MarkupChildTag {
 	}
 	
 	public override MarkupTag? resolve (MarkupResolver resolver) throws ParseError {
-		if (!tag_namespace.explicit_prefix && markup_attributes.size == 0)  { //candidate for attribute
-			ObjectTypeSymbol parent_object = parent_tag.resolved_type.data_type as ObjectTypeSymbol;
-			if (parent_object != null) {
-				foreach (Property p in parent_object.get_properties ()) {
-					if (p.name == tag_name) {
-						//TODO: transform this into attribute
-						return null; //remove 'this' from parent
-					}
-				}
-			} else stderr.printf ("Teapa %s\n", parent_tag.resolved_type.data_type.to_string ());
-			//TODO: search through fields too?
-		}
-		
 		var markup_temp = new MarkupTemp (parent_tag, tag_name, tag_namespace, source_reference);
+		//try resolving as a type
+		MarkupTag? result = markup_temp.resolve (resolver);
+		if (!tag_namespace.explicit_prefix && markup_attributes.size == 0)  { //candidate for attribute
+			if (markup_temp.resolved_type.data_type == null) {
+				//failed => is an attribute
+				switch (child_tags.size) {
+					case 0:
+						parent_tag.add_markup_attribute (new MarkupAttribute (tag_name, text, source_reference));
+						return null;
+					case 1:
+						parent_tag.add_markup_attribute (new MarkupComplexAttribute (tag_name, parent_tag, child_tags[0], source_reference));
+						return null;
+					default:
+						throw new ParseError.SYNTAX ("Don't know how to handle %s".printf (tag_name));
+				}
+			}
+		}
 		parent_tag.replace_child_tag (this, markup_temp);
-		return markup_temp.resolve (resolver);
+		return result;
 	}
 	
 	public override void generate (MarkupResolver resolver) throws ParseError {

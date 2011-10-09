@@ -65,6 +65,9 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 				}
 			}
 		}
+		
+		if (class_name == null)
+			throw new ParseError.SYNTAX ("At least the one of the: 'internal', 'public', or 'name' must be specified on the root tag");
 
 		string base_name = parse_identifier (scanner.node->name);
 

@@ -74,6 +74,9 @@ public class Gtkaml.MarkupResolver : SymbolResolver {
 		MarkupTag? resolved_tag = markup_tag.resolve (this);
 		
 		if (resolved_tag != null) {
+			if (resolved_tag.resolved_type.data_type == null) 
+				throw new ParseError.SYNTAX ("Unknown type %s".printf (resolved_tag.tag_name));
+			
 			Vala.List<MarkupChildTag> to_remove = new Vala.ArrayList<MarkupChildTag> ();
 
 			//recurse

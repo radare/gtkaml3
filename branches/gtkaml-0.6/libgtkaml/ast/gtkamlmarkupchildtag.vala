@@ -47,7 +47,7 @@ public abstract class Gtkaml.Ast.MarkupChildTag : MarkupTag {
 	/**
 	 * determines the composition method to use, setting `composition_method` and `composition_parameters`
 	 */
-	protected void resolve_composition_method (MarkupResolver resolver) {
+	protected void resolve_composition_method (MarkupResolver resolver) throws ParseError {
 		if (standalone) return;
 		var candidates = resolver.get_composition_method_candidates (this.parent_tag.resolved_type.data_type as TypeSymbol);
 		

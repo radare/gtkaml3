@@ -6,9 +6,12 @@ using Vala;
  */
 public class Gtkaml.Ast.MarkupComplexAttribute : MarkupAttribute {
 
-	public MarkupComplexAttribute (string attribute_name, MarkupTag parent_tag, SourceReference? source_reference = null) {
+	private MarkupTag value_tag;
+
+	public MarkupComplexAttribute (string attribute_name, MarkupTag parent_tag, MarkupTag value_tag, SourceReference? source_reference = null) {
 		base (attribute_name, parent_tag.me, source_reference);
-		assert_not_reached ();
+		this.value_tag = value_tag;
+		Report.warning (source_reference, "Complex attributes are not supported");
 	}
 
 	public override Expression get_expression (MarkupResolver resolver, MarkupTag markup_tag) throws ParseError {

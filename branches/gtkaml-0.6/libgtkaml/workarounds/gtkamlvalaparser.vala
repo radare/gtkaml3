@@ -25,7 +25,7 @@ public class Gtkaml.ValaParser {
 		if (temp_ns is Namespace && temp_ns.get_classes ().size == 1) {
 			return temp_ns.get_classes ().get (0);
 		} else {
-			throw new ParseError.SYNTAX ("There was an error parsing the code section.");
+			throw new ParseError.SYNTAX ("There was an error parsing the code section: members");
 		}
 	}
 	
@@ -41,7 +41,7 @@ public class Gtkaml.ValaParser {
 			var temp_lambda = (LambdaExpression)temp_ns.get_fields ().get (0).initializer;
 			return temp_lambda.expression_body;
 		} else {
-			throw new ParseError.SYNTAX ("There was an error parsing the code section.");
+			throw new ParseError.SYNTAX ("There was an error parsing the code section: expression");
 		}
 	}
 	
@@ -57,7 +57,7 @@ public class Gtkaml.ValaParser {
 			var temp_lambda = (LambdaExpression)temp_ns.get_fields ().get (0).initializer;
 			return temp_lambda.statement_body;
 		} else {
-			throw new ParseError.SYNTAX ("There was an error parsing the code section.");
+			throw new ParseError.SYNTAX ("There was an error parsing the code section: statements");
 		}
 	}
 

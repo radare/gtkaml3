@@ -19,12 +19,12 @@ public class Gtkaml.Ast.MarkupUnresolvedTag : MarkupChildTag {
 	}
 	
 	public override MarkupTag? resolve (MarkupResolver resolver) throws ParseError {
-		var markup_temp = new MarkupTemp (parent_tag, tag_name, tag_namespace, source_reference);
-		//try resolving as a type
-		MarkupTag? result = markup_temp.resolve (resolver);
+		//try to silently resolve as a type
+		resolve_silently (resolver);
+
 		if (!tag_namespace.explicit_prefix && markup_attributes.size == 0)  { //candidate for attribute
-			if (markup_temp.resolved_type.data_type == null) {
-				//failed => is an attribute
+			if (resolved_type.data_type == null) {
+				//resolve failed => is an attribute
 				switch (child_tags.size) {
 					case 0:
 						parent_tag.add_markup_attribute (new MarkupAttribute (tag_name, text, source_reference));
@@ -37,11 +37,25 @@ public class Gtkaml.Ast.MarkupUnresolvedTag : MarkupChildTag {
 				}
 			}
 		}
+		var markup_temp = new MarkupTemp (parent_tag, tag_name, tag_namespace, source_reference);
+		markup_temp.resolve (resolver);
 		parent_tag.replace_child_tag (this, markup_temp);
-		return result;
+		return markup_temp;
 	}
 	
 	public override void generate (MarkupResolver resolver) throws ParseError {
 		assert_not_reached ();//unresolved tags are replaced with temporary variables or complex attributes at resolve () time
+	}
+	
+	private void resolve_silently (MarkupResolver resolver) {
+		if (! (data_type is UnresolvedType))
+			return;
+
+		//this prevents reporting another error
+		((UnresolvedType)data_type).unresolved_symbol.error = true;
+
+		resolver.visit_data_type (data_type);
+
+		((UnresolvedType)data_type).unresolved_symbol.error = false;
 	}
 }

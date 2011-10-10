@@ -17,7 +17,7 @@ public class Gtkaml.Ast.MarkupReference : MarkupChildTag {
 	public override string me { get { return existing_name; }}
 
 	public override void generate_public_ast (MarkupParser parser) throws ParseError {
-		//No public AST that ain't there already
+		//No public AST that ain't there already for references
 	}
 	
 	public override MarkupTag? resolve (MarkupResolver resolver) throws ParseError {
@@ -31,7 +31,7 @@ public class Gtkaml.Ast.MarkupReference : MarkupChildTag {
 	}
 	
 	public override void generate (MarkupResolver resolver) throws ParseError {
-		//removed: generate construct_..()
+		//removed: generate construct_..() for references
 		base.generate (resolver);
 	}
 }

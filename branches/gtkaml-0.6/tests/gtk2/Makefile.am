@@ -1,9 +1,12 @@
-ALL = basic_container_add_test test1 test2 test3 test4 test6 test7 test8 test9
+ALL = basic_container_add_test basic_tag_attribute_test test1 test2 test3 test4 test6 test7 test8 test9
 
 
 all: $(ALL)
 
 basic_container_add_test : $@.gtkaml
+	$(top_srcdir)/src/gtkamlc $(VALAFLAGS) --pkg gtk+-2.0 $@.gtkaml --dump-tree $@.vala
+
+basic_tag_attribute_test : $@.gtkaml
 	$(top_srcdir)/src/gtkamlc $(VALAFLAGS) --pkg gtk+-2.0 $@.gtkaml --dump-tree $@.vala
 
 test1 : $@.gtkaml

@@ -145,13 +145,17 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 		markup_tag.add_markup_attribute (attribute);
 	}
 	
-	string parse_text (MarkupScanner scanner) throws ParseError {
+	string parse_text (MarkupScanner scanner, bool strip_simple_text = false) throws ParseError {
 		string text = "";
 		for (Xml.Node* node = scanner.node->children; node != null; node = node->next)
 		{
 			if (node->type != ElementType.CDATA_SECTION_NODE && node->type != ElementType.TEXT_NODE) 
 				continue;//TODO break?
-			text += node->content + "\n";
+			if (strip_simple_text && node->type == ElementType.TEXT_NODE) {
+				text += node->content.strip ();
+			} else {
+				text += node->content;
+			}
 		}
 		return text.chomp ();
 	}
@@ -194,6 +198,7 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 		markup_tag.standalone = parse_markup_subtag_is_standalone (scanner);
 		
 		parent_tag.add_child_tag (markup_tag);
+		markup_tag.text = parse_text (scanner, true);
 		parse_attributes (scanner, markup_tag);
 		markup_tag.generate_public_ast (this);
 		

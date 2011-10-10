@@ -135,11 +135,31 @@ public abstract class Gtkaml.Ast.MarkupTag : Object {
 			markup_class.constructor.body.add_statement (attribute.get_assignment (resolver, this));
 		}
 	}
+
+	public virtual void generate_preconstruct (MarkupResolver resolver) throws ParseError
+	{
+		if (preconstruct_text != null) {
+			var stmts = resolver.code_parser.parse_statements (this.markup_class, this.me, "_preconstruct", strip_braces (preconstruct_text));
+			foreach (var stmt in stmts.get_statements ()) {
+				markup_class.constructor.body.add_statement (stmt);
+			}
+		}
+	}
+
+	public virtual void generate_construct (MarkupResolver resolver) throws ParseError
+	{
+		if (construct_text != null) {
+			var stmts = resolver.code_parser.parse_statements (this.markup_class, this.me, "_construct", strip_braces (construct_text));
+			foreach (var stmt in stmts.get_statements ())
+				markup_class.constructor.body.add_statement (stmt);
+		}
+	}
+
 	
 	/**
 	 * picks up creation method parameters and determines the creation method, if applicable
 	 */
-	public virtual void resolve_creation_method (MarkupResolver resolver) {
+	protected virtual void resolve_creation_method (MarkupResolver resolver) {
 		var candidates = get_creation_method_candidates ();
 		
 		//go through each method, updating max&max_match_method if it matches and min&min_match_method otherwise
@@ -300,25 +320,6 @@ public abstract class Gtkaml.Ast.MarkupTag : Object {
 		var member_access = new MemberAccess (namespace_access, tag_name, source_reference);
 		
 		return member_access;
-	}
-
-	protected void generate_preconstruct (MarkupResolver resolver) throws ParseError
-	{
-		if (preconstruct_text != null) {
-			var stmts = resolver.code_parser.parse_statements (this.markup_class, this.me, "_preconstruct", strip_braces (preconstruct_text));
-			foreach (var stmt in stmts.get_statements ()) {
-				markup_class.constructor.body.add_statement (stmt);
-			}
-		}
-	}
-
-	protected void generate_construct (MarkupResolver resolver) throws ParseError
-	{
-		if (construct_text != null) {
-			var stmts = resolver.code_parser.parse_statements (this.markup_class, this.me, "_construct", strip_braces (construct_text));
-			foreach (var stmt in stmts.get_statements ())
-				markup_class.constructor.body.add_statement (stmt);
-		}
 	}
 	
 	private string strip_braces (string code) throws ParseError {

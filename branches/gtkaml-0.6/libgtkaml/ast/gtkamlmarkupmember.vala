@@ -29,7 +29,6 @@ public class Gtkaml.Ast.MarkupMember : MarkupChildTag {
 	
 	public override void generate (MarkupResolver resolver) throws ParseError {
 		generate_construct_member (resolver);
-		base.generate (resolver);
 	}
 	
 	private void generate_property () {

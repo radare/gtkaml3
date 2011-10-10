@@ -86,6 +86,7 @@ public class Gtkaml.MarkupResolver : SymbolResolver {
 				}
 			}
 		
+			//remove 
 			foreach (var remove in to_remove)
 				resolved_tag.remove_child_tag (remove);
 				
@@ -100,9 +101,11 @@ public class Gtkaml.MarkupResolver : SymbolResolver {
 	 */
 	protected void generate_markup_tag (MarkupTag markup_tag) throws ParseError {
 		markup_tag.generate (this);
+		markup_tag.generate_preconstruct (this);
 		foreach (MarkupTag child_tag in markup_tag.get_child_tags ())
 			generate_markup_tag (child_tag);
 		markup_tag.generate_attributes (this);
+		markup_tag.generate_construct (this);
 	}
 	
 	/** 

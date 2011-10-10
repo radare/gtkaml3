@@ -27,7 +27,6 @@ public class Gtkaml.Ast.MarkupTemp : MarkupChildTag {
 	
 	public override void generate (MarkupResolver resolver) throws ParseError {
 		generate_construct_local (resolver);
-		base.generate (resolver);
 	}
 	
 	private void generate_construct_local(MarkupResolver resolver) throws ParseError {		

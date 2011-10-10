@@ -37,12 +37,10 @@ public abstract class Gtkaml.Ast.MarkupChildTag : MarkupTag {
 		resolve_composition_method (resolver);
 	}
 
-	public override void generate (MarkupResolver resolver) throws ParseError {
-		generate_preconstruct (resolver);
+	public override void generate_construct (MarkupResolver resolver) throws ParseError {
+		base.generate_construct (resolver);
 		generate_add (resolver);
-		generate_construct (resolver);
 	}
-
 
 	/**
 	 * determines the composition method to use, setting `composition_method` and `composition_parameters`

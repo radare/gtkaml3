@@ -33,7 +33,7 @@ public class Gtkaml.Ast.MarkupUnresolvedTag : MarkupChildTag {
 						parent_tag.add_markup_attribute (new MarkupComplexAttribute (tag_name, parent_tag, child_tags[0], source_reference));
 						return null;
 					default:
-						throw new ParseError.SYNTAX ("Don't know how to handle %s".printf (tag_name));
+						throw new ParseError.SYNTAX ("Don't know how to handle `%s's children".printf (tag_name));
 				}
 			}
 		}

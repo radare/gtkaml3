@@ -108,9 +108,13 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 	}
 
 	MarkupNamespace parse_namespace (MarkupScanner scanner) throws ParseError {
-		MarkupNamespace ns = new MarkupNamespace (null, scanner.node->ns->href);
-		ns.explicit_prefix = (scanner.node->ns->prefix != null);
-		return ns;
+		if (scanner.node->ns != null) {
+			MarkupNamespace ns = new MarkupNamespace (null, scanner.node->ns->href);
+			ns.explicit_prefix = (scanner.node->ns->prefix != null);
+			return ns;
+		} else {
+			throw new ParseError.SYNTAX ("namespace error");
+		}
 	}
 	
 	void parse_attributes (MarkupScanner scanner, MarkupTag markup_tag) throws ParseError {
@@ -166,7 +170,7 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 			if (node->type != ElementType.ELEMENT_NODE) continue;
 			
 			scanner.node = node;
-			if (scanner.node->ns->href == scanner.gtkaml_uri)
+			if (scanner.node->ns != null && scanner.node->ns->href == scanner.gtkaml_uri)
 				parse_gtkaml_tag (scanner, parent_tag);
 			else
 				parse_markup_subtag(scanner, parent_tag);

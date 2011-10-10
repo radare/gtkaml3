@@ -20,7 +20,9 @@ public class Gtkaml.Ast.MarkupRoot : MarkupTag {
 	}
 
 	public override void generate (MarkupResolver resolver) throws ParseError {
+		generate_preconstruct (resolver);
 		generate_creation_method (resolver);
+		generate_construct (resolver);
 	}
 
 	//TODO: is this still necessary? maybe we should allow more candidates here too

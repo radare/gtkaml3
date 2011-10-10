@@ -301,6 +301,38 @@ public abstract class Gtkaml.Ast.MarkupTag : Object {
 		
 		return member_access;
 	}
+
+	protected void generate_preconstruct (MarkupResolver resolver) throws ParseError
+	{
+		if (preconstruct_text != null) {
+			var stmts = resolver.code_parser.parse_statements (this.markup_class, this.me, "_preconstruct", strip_braces (preconstruct_text));
+			foreach (var stmt in stmts.get_statements ()) {
+				markup_class.constructor.body.add_statement (stmt);
+			}
+		}
+	}
+
+	protected void generate_construct (MarkupResolver resolver) throws ParseError
+	{
+		if (construct_text != null) {
+			var stmts = resolver.code_parser.parse_statements (this.markup_class, this.me, "_construct", strip_braces (construct_text));
+			foreach (var stmt in stmts.get_statements ())
+				markup_class.constructor.body.add_statement (stmt);
+		}
+	}
 	
+	private string strip_braces (string code) throws ParseError {
+		string stripped_value = code.strip ();
+		if (stripped_value.has_prefix ("{")) {
+			if (stripped_value.has_suffix ("}")) {
+				return stripped_value.substring (1, stripped_value.length - 2);
+			} else {
+				throw new ParseError.SYNTAX ("Unbalanced braces");
+			}
+		} else {
+			return code;
+		}
+	}
+
 }
 

@@ -33,6 +33,7 @@ libgtkaml_la_VALASOURCES = \
 	gtkamlmarkupparser.vala \
 	gtkamlmarkupscanner.vala \
 	gtkamlmarkupresolver.vala \
+	gtkamlcodeparserprovider.vala \
 	ast/gtkamlmarkupattribute.vala \
 	ast/gtkamlmarkupcomplexattribute.vala \
 	gtkamlmarkupclass.vala \

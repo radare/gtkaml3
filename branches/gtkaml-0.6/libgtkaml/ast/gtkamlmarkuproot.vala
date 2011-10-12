@@ -12,7 +12,7 @@ public class Gtkaml.Ast.MarkupRoot : MarkupTag {
 	
 	public override string me { get { return "this"; } }
 
-	public override void generate_public_ast (MarkupParser parser) throws ParseError {
+	public override void generate_public_ast (CodeParserProvider parser) throws ParseError {
 		markup_class.add_base_type (data_type.copy ());
 		markup_class.constructor = new Constructor (markup_class.source_reference);
 		markup_class.constructor.body = new Block (markup_class.source_reference);	
@@ -45,7 +45,7 @@ public class Gtkaml.Ast.MarkupRoot : MarkupTag {
 	}
 
 
-	private void parse_class_members (MarkupParser parser, string source) throws ParseError {
+	private void parse_class_members (CodeParserProvider parser, string source) throws ParseError {
 		var temp_class = parser.code_parser.parse_members (markup_class, source);
 		foreach (var x in temp_class.get_constants ()) { markup_class.add_constant (x); };
 		foreach (var x in temp_class.get_fields ()) { markup_class.add_field (x); };

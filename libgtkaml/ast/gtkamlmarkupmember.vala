@@ -18,13 +18,8 @@ public class Gtkaml.Ast.MarkupMember : MarkupChildTag {
 
 	public override string me { get { return member_name; }}
 
-	public override void generate_public_ast (MarkupParser parser) throws ParseError {
+	public override void generate_public_ast (CodeParserProvider parser) throws ParseError {
 		generate_property ();
-	}
-	
-	public override MarkupTag? resolve (MarkupResolver resolver) throws ParseError {
-		resolver.visit_data_type (data_type);
-		return this;
 	}
 	
 	public override void generate (MarkupResolver resolver) throws ParseError {

@@ -6,7 +6,7 @@ using Gtkaml.Ast;
 /**
  * Gtkaml Parser
  */
-public class Gtkaml.MarkupParser : CodeVisitor {
+public class Gtkaml.MarkupParser : CodeVisitor, CodeParserProvider {
 
 	private CodeContext context;
 	
@@ -69,7 +69,7 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 		if (class_name == null)
 			throw new ParseError.SYNTAX ("At least the one of the: 'internal', 'public', or 'name' must be specified on the root tag");
 
-		string base_name = parse_identifier (scanner.node->name);
+		string base_name = parse_symbol_name (scanner.node->name);
 
 		MarkupClass markup_class = new MarkupClass (base_name, base_ns, class_name, scanner.get_src ());
 
@@ -90,9 +90,14 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 	}
 	
 	string parse_identifier (string identifier) throws ParseError {
+		//TODO return UnresolvedSymbol and split by .name.spa.ce?
 		return identifier;
 	}
-
+	
+	string parse_symbol_name (string symbol_name) {
+		return symbol_name.replace ("-", "_");
+	}
+	
 	void parse_using_directives (MarkupScanner scanner) throws ParseError {
 		for (Ns* ns = scanner.node->ns_def; ns != null; ns = ns->next) {
 			if (ns->href != scanner.gtkaml_uri) 
@@ -144,8 +149,8 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 	}
 	
 	void parse_attribute (MarkupTag markup_tag, string name, string value) throws ParseError {
-		string undername = name.replace ("-", "_");
-		MarkupAttribute attribute = new MarkupAttribute (undername, value, markup_tag.source_reference);
+		string attrname = parse_symbol_name (name);
+		MarkupAttribute attribute = new MarkupAttribute (attrname, value, markup_tag.source_reference);
 		markup_tag.add_markup_attribute (attribute);
 	}
 	
@@ -184,18 +189,20 @@ public class Gtkaml.MarkupParser : CodeVisitor {
 
 		string identifier = parse_markup_subtag_identifier (scanner, ref accessibility);
 		string reference = parse_markup_subtag_reference (scanner);
+		string type_name = parse_symbol_name (scanner.node->name);
+		var type_namespace = parse_namespace (scanner);
 
 		if (identifier != null) {
 			if (reference != null)
-				throw new ParseError.SYNTAX ("Cannot specify both an existing identifier and a new one");
-			markup_tag = new MarkupMember (parent_tag, scanner.node->name, parse_namespace (scanner), identifier, accessibility, scanner.get_src ());
+				throw new ParseError.SYNTAX ("Cannot specify both an existing reference and a new identifier");
+			markup_tag = new MarkupMember (parent_tag, type_name, type_namespace, identifier, accessibility, scanner.get_src ());
 		} else if (reference != null) {
-			markup_tag = new MarkupReference (parent_tag, scanner.node->name, parse_namespace (scanner), reference, scanner.get_src ());
+			markup_tag = new MarkupReference (parent_tag, type_name, type_namespace, reference, scanner.get_src ());
 		} else {
 			if (scanner.node->properties != null) { //has attributes
-				markup_tag = new MarkupTemp (parent_tag, scanner.node->name, parse_namespace (scanner), scanner.get_src ());
+				markup_tag = new MarkupTemp (parent_tag, type_name, type_namespace, scanner.get_src ());
 			} else { 
-				markup_tag = new MarkupUnresolvedTag (parent_tag, scanner.node->name, parse_namespace (scanner), scanner.get_src ());
+				markup_tag = new MarkupUnresolvedTag (parent_tag, type_name, type_namespace, scanner.get_src ());
 			}
 		}
 		

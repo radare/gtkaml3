@@ -100,7 +100,7 @@ public abstract class Gtkaml.Ast.MarkupTag : Object {
 	 * This only generates placeholder Vala AST so that the Parser can move on.
 	 * e.g. the class itself, its public properties go here.
 	 */
-	public abstract void generate_public_ast (MarkupParser parser) throws ParseError;
+	public abstract void generate_public_ast (CodeParserProvider parser) throws ParseError;
 
 	/**
 	 * Called when Gtkaml is resolving. 
@@ -132,6 +132,9 @@ public abstract class Gtkaml.Ast.MarkupTag : Object {
 	public virtual void generate_attributes (MarkupResolver resolver) throws ParseError	{
 		
 		foreach (var attribute in markup_attributes) {
+			if (attribute is MarkupComplexAttribute) {
+				resolver.generate_markup_tag (((MarkupComplexAttribute)attribute).value_tag);
+			}
 			markup_class.constructor.body.add_statement (attribute.get_assignment (resolver, this));
 		}
 	}

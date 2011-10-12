@@ -16,13 +16,8 @@ public class Gtkaml.Ast.MarkupTemp : MarkupChildTag {
 		temp_name = ("_" + tag_name + markup_class.get_temp_name ()).replace (".", "_");
 	}
 	
-	public override void generate_public_ast (MarkupParser parser) throws ParseError {
+	public override void generate_public_ast (CodeParserProvider parser) throws ParseError {
 		//nothing public about local temps
-	}
-
-	public override MarkupTag? resolve (MarkupResolver resolver) throws ParseError {
-		resolver.visit_data_type (data_type);
-		return this;
 	}
 	
 	public override void generate (MarkupResolver resolver) throws ParseError {

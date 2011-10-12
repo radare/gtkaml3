@@ -5,7 +5,7 @@ using Gtkaml.Ast;
 /**
  * Gtkaml SymbolResolver
  */
-public class Gtkaml.MarkupResolver : SymbolResolver {
+public class Gtkaml.MarkupResolver : SymbolResolver, CodeParserProvider {
 
 	public MarkupHintsStore markup_hints;
 	public ValaParser code_parser {get; private set;}
@@ -14,7 +14,7 @@ public class Gtkaml.MarkupResolver : SymbolResolver {
 
 	public void resolve (CodeContext context) {
 		markup_hints = new MarkupHintsStore (context);
-		code_parser = new ValaParser (context); //TODO move this per class
+		code_parser = new ValaParser (context); //TODO move this per class?
 		markup_hints.parse ();
 		this.context = context;
 		base.resolve (context);
@@ -99,7 +99,7 @@ public class Gtkaml.MarkupResolver : SymbolResolver {
 	/**
 	 * processes tag hierarchy, calling generate () on each, then recurses, then generate_attributes () 
 	 */
-	protected void generate_markup_tag (MarkupTag markup_tag) throws ParseError {
+	public void generate_markup_tag (MarkupTag markup_tag) throws ParseError {
 		markup_tag.generate (this);
 		markup_tag.generate_preconstruct (this);
 		foreach (MarkupTag child_tag in markup_tag.get_child_tags ())

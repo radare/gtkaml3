@@ -13,11 +13,12 @@ public class Gtkaml.Ast.MarkupComplexAttribute : MarkupAttribute {
 		this.value_tag = value_tag;
 	}
 
-	public override Expression get_expression (MarkupResolver resolver, MarkupTag markup_tag) throws ParseError {
+	public override Expression? get_expression (MarkupResolver resolver, MarkupTag markup_tag) throws ParseError {
 		resolve (resolver, markup_tag);
 		
 		if (@signal != null) {
-			throw new ParseError.SYNTAX ("Signals cannot be defined as complex attributes");
+			Report.error (source_reference, "Signals cannot be defined as complex attributes");
+			return null;
 		} else {
 			return new MemberAccess.simple (value_tag.me, source_reference);
 		}

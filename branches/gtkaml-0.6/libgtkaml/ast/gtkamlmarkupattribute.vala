@@ -27,7 +27,7 @@ public class Gtkaml.Ast.MarkupAttribute {
 		this.source_reference = source_reference;
 	}
 	
-	public virtual Expression get_expression (MarkupResolver resolver, MarkupTag markup_tag) throws ParseError {
+	public virtual Expression? get_expression (MarkupResolver resolver, MarkupTag markup_tag) throws ParseError {
 		resolve (resolver, markup_tag);
 		
 		string stripped_value = attribute_value.strip ();
@@ -42,7 +42,7 @@ public class Gtkaml.Ast.MarkupAttribute {
 					foreach (var parameter in @signal.get_parameters ()) {
 						lambda.add_parameter (parameter);
 					}
-					
+		
 					return lambda;
 				} else {
 					return resolver.code_parser.parse_expression (markup_tag.markup_class, markup_tag.me, attribute_name, code_source);
@@ -52,46 +52,33 @@ public class Gtkaml.Ast.MarkupAttribute {
 			}
 		} else {
 			if (@signal != null) {
-				Expression symbol_access = null;
-				foreach (var symbol in stripped_value.split ("."))
-					symbol_access = new MemberAccess (symbol_access, symbol, source_reference);
-				return symbol_access;
+				return resolver.code_parser.parse_expression (markup_tag.markup_class, markup_tag.me, attribute_name, stripped_value);
 			} else {
-				assert (target_type != null);
-				var type_name = target_type.data_type.get_full_name ();
-				if (type_name == "string") {
-					return new StringLiteral ("\"" + attribute_value.replace ("\"", "\\\"") + "\"", source_reference);
-				} else if (type_name == "bool") {
-					//TODO: full boolean check 
-					return new BooleanLiteral (attribute_value == "true", source_reference);
-				} else if (type_name == "int" || type_name == "uint") {
-					return new IntegerLiteral (attribute_value, source_reference);
-				} else if (type_name == "double" || type_name == "float") {
-					return new RealLiteral (attribute_value, source_reference);
-				} else if (target_type is ReferenceType && stripped_value == "null") {
-					return new NullLiteral (source_reference);
-				} else {
-					Report.error (source_reference, "Error: attribute literal of '%s' type found\n".printf (target_type.data_type.get_full_name ()));
-				} 
-				//TODO enum here too
+				return generate_literal (stripped_value);
 			}
 		}
-		assert_not_reached ();//TODO return an invalid expression
+		return null;
 	}
 
-	public virtual Statement get_assignment (MarkupResolver resolver, MarkupTag markup_tag) throws ParseError {
+	public virtual Statement? get_assignment (MarkupResolver resolver, MarkupTag markup_tag) throws ParseError {
 		resolve (resolver, markup_tag);
+
+		Expression assignment;
+		Expression? right_hand = get_expression (resolver, markup_tag);
+		
+		if (right_hand == null)
+			return null;
 
 		var parent_access = new MemberAccess.simple (markup_tag.me, source_reference);
 		var attribute_access = new MemberAccess (parent_access, attribute_name, source_reference);
-		Expression assignment;
+		
 		if (@signal != null) {
 			var connect_call = new MethodCall ( new MemberAccess (attribute_access, "connect", source_reference), source_reference);
-			connect_call.add_argument (get_expression (resolver, markup_tag));
+			connect_call.add_argument (right_hand);
 			assignment = connect_call;
 			//assignment = new Assignment (attribute_access, get_expression (resolver, markup_tag), AssignmentOperator.ADD, source_reference);
 		} else {
-			assignment = new Assignment (attribute_access, get_expression (resolver, markup_tag), AssignmentOperator.SIMPLE, source_reference);
+			assignment = new Assignment (attribute_access, right_hand, AssignmentOperator.SIMPLE, source_reference);
 		}
 		return new ExpressionStatement (assignment);
 	}
@@ -113,6 +100,27 @@ public class Gtkaml.Ast.MarkupAttribute {
 			//TODO: it's a parameter for add/create .. maybe
 		}
 	}
-
+	
+	protected Expression? generate_literal (string stripped_value) {
+		assert (target_type != null);
+		var type_name = target_type.data_type.get_full_name ();
+		if (type_name == "string") {
+			return new StringLiteral ("\"" + attribute_value.replace ("\"", "\\\"") + "\"", source_reference);
+		} else if (type_name == "bool") {
+			//TODO: full boolean check 
+			return new BooleanLiteral (attribute_value == "true", source_reference);
+		} else if (type_name == "int" || type_name == "uint") {
+			return new IntegerLiteral (attribute_value, source_reference);
+		} else if (type_name == "double" || type_name == "float") {
+			return new RealLiteral (attribute_value, source_reference);
+		} else if (target_type is ReferenceType && stripped_value == "null") {
+			return new NullLiteral (source_reference);
+		} else {
+			//TODO enum here too
+			Report.error (source_reference, "Error: attribute literal of '%s' type found\n".printf (target_type.data_type.get_full_name ()));
+			return null;
+		} 
+	}
+	
 }
 

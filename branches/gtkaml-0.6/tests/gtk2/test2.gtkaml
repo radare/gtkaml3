@@ -8,7 +8,8 @@ Maybe it would be good to have a test suite to avoid regressions
 	xmlns:Gtk="Gtk"
 	xmlns:GLib="GLib"
 	delete-event="{OnWindowCloseEvent}"
-	title="ragui">
+	title="ragui"
+	class:name="fail">
   <VBox>
     <Notebook expand="true" tab-vborder="1">
       <VBox>

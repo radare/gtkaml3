@@ -135,7 +135,9 @@ public abstract class Gtkaml.Ast.MarkupTag : Object {
 			if (attribute is MarkupComplexAttribute) {
 				resolver.generate_markup_tag (((MarkupComplexAttribute)attribute).value_tag);
 			}
-			markup_class.constructor.body.add_statement (attribute.get_assignment (resolver, this));
+			var assignment = attribute.get_assignment (resolver, this);
+			if (assignment != null)
+				markup_class.constructor.body.add_statement (attribute.get_assignment (resolver, this));
 		}
 	}
 

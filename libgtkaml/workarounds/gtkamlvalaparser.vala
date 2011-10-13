@@ -22,6 +22,10 @@ public class Gtkaml.ValaParser {
 		var temp_source = "public class %s { %s }".printf (class_name, members_source);
 		
 		var temp_ns = parse (markup_class.source_reference.file, temp_source, class_name + "-members");
+		
+		while (temp_ns.get_namespaces ().size > 0)
+			temp_ns = temp_ns.get_namespaces ()[0];
+		
 		if (temp_ns is Namespace && temp_ns.get_classes ().size == 1) {
 			return temp_ns.get_classes ().get (0);
 		} else {

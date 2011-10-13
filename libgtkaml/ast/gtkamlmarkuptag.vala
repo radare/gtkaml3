@@ -316,15 +316,12 @@ public abstract class Gtkaml.Ast.MarkupTag : Object {
 	 * returns ns.ns.ns.Class member access
 	 */
 	protected MemberAccess get_class_expression () {
-		MemberAccess namespace_access = null;
-		UnresolvedSymbol ns = tag_namespace;
-		while (ns is UnresolvedSymbol) {
-			namespace_access = new MemberAccess(namespace_access, ns.name, source_reference);
-			ns = ns.inner;
-		}
-		var member_access = new MemberAccess (namespace_access, tag_name, source_reference);
-		
-		return member_access;
+		return new MemberAccess (namespace_access (tag_namespace), tag_name, source_reference);
+	}
+	
+	private MemberAccess? namespace_access (UnresolvedSymbol? ns) {
+		if (ns == null) return null;
+		return new MemberAccess (namespace_access (ns.inner), ns.name, source_reference);
 	}
 	
 	private string strip_braces (string code) throws ParseError {

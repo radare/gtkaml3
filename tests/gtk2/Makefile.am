@@ -19,7 +19,7 @@ test2 : $@.gtkaml
 	$(top_srcdir)/src/gtkamlc $(VALAFLAGS) --pkg gtk+-2.0 $@.gtkaml --dump-tree $@.vala
 
 test3 : $@.gtkaml
-	$(top_srcdir)/src/gtkamlc $(VALAFLAGS) --pkg gtk+-2.0 $@.gtkaml --dump-tree $@.vala
+	$(top_srcdir)/src/gtkamlc $(VALAFLAGS) --pkg gtk+-2.0 $@.gtkaml WindowController.vala --dump-tree $@.vala
 
 test4 : $@.gtkaml
 	$(top_srcdir)/src/gtkamlc $(VALAFLAGS) --pkg gtk+-2.0 $@.gtkaml --dump-tree $@.vala

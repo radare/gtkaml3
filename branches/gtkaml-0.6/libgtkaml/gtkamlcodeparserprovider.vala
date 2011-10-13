@@ -2,7 +2,7 @@ using Vala;
 using Gtkaml;
 
 /**
- * common interface between resolver and parser: to be able to parse Vala code
+ * common interface between resolver and parser: to provide a parser of Vala code
  */
 public interface Gtkaml.CodeParserProvider : CodeVisitor {
 

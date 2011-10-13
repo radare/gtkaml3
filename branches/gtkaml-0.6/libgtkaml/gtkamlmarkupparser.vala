@@ -70,14 +70,21 @@ public class Gtkaml.MarkupParser : CodeVisitor, CodeParserProvider {
 			throw new ParseError.SYNTAX ("At least the one of the: 'internal', 'public', or 'name' must be specified on the root tag");
 
 		string base_name = parse_symbol_name (scanner.node->name);
+		string[] target_ns_names = class_name.split (".");
+		class_name = target_ns_names [target_ns_names.length - 1];
+		Namespace target_namespace = context.root;
+		
+		for (int i = 0; i < target_ns_names.length - 1; i++) {
+			var sub_namespace = new Namespace (target_ns_names [i], scanner.get_src ());
+			target_namespace.add_namespace (sub_namespace);
+			target_namespace = sub_namespace;
+		}
+		
 
 		MarkupClass markup_class = new MarkupClass (base_name, base_ns, class_name, scanner.get_src ());
 
 		markup_class.access = access;
 
-		//TODO: create another NS in lieu of target_namespace
-		Namespace target_namespace = context.root;
-		
 		target_namespace.add_class (markup_class);
 		//scanner.source_file.add_node (markup_class);
 
@@ -106,7 +113,7 @@ public class Gtkaml.MarkupParser : CodeVisitor, CodeParserProvider {
 	}
 	
 	void parse_using_directive (MarkupScanner scanner, string ns) throws ParseError {
-		var ns_sym = new UnresolvedSymbol (null, parse_identifier(ns), scanner.get_src ());
+		var ns_sym = parse_namespace_symbol (scanner, ns);
 		var ns_ref = new UsingDirective (ns_sym, ns_sym.source_reference);
 		scanner.source_file.add_using_directive (ns_ref);
 		context.root.add_using_directive (ns_ref);
@@ -114,12 +121,20 @@ public class Gtkaml.MarkupParser : CodeVisitor, CodeParserProvider {
 
 	MarkupNamespace parse_namespace (MarkupScanner scanner) throws ParseError {
 		if (scanner.node->ns != null) {
-			MarkupNamespace ns = new MarkupNamespace (null, scanner.node->ns->href);
+			MarkupNamespace ns = parse_namespace_symbol (scanner, scanner.node->ns->href);
 			ns.explicit_prefix = (scanner.node->ns->prefix != null);
 			return ns;
 		} else {
 			throw new ParseError.SYNTAX ("namespace error");
 		}
+	}
+	
+	MarkupNamespace parse_namespace_symbol (MarkupScanner scanner, string ns) throws ParseError {
+		MarkupNamespace ns_sym = null;
+		foreach (var ns_name in parse_identifier(ns).split (".")) {
+			ns_sym = new MarkupNamespace (ns_sym, ns_name, scanner.get_src ());
+		}
+		return ns_sym;
 	}
 	
 	void parse_attributes (MarkupScanner scanner, MarkupTag markup_tag) throws ParseError {

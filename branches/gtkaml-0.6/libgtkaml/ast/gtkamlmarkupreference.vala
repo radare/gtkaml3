@@ -32,6 +32,5 @@ public class Gtkaml.Ast.MarkupReference : MarkupChildTag {
 	
 	public override void generate (MarkupResolver resolver) throws ParseError {
 		//removed: generate construct_..() for references
-		base.generate (resolver);
 	}
 }

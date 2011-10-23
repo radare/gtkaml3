@@ -12,7 +12,7 @@ public class Gtkaml.MarkupResolver : SymbolResolver, CodeParserProvider {
 
 	CodeContext context {get; set;}
 
-	public void resolve (CodeContext context) {
+	public new void resolve (CodeContext context) {
 		markup_hints = new MarkupHintsStore (context);
 		code_parser = new ValaParser (context);
 		markup_hints.parse ();

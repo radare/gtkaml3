@@ -1,5 +1,6 @@
 Changes since gtkaml 0.4:
 - rewritten to directly generate vala AST nodes
+- split into gtkamlc and libgtkaml.so
 - *.implicits files renamed to *.markuphints
 
 Features:

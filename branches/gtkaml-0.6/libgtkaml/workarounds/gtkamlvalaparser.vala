@@ -1,9 +1,9 @@
 using GLib;
 using Vala;
 
-//TODO: make ValaParser markup-class dependent? or file dependent?
 /**
- * Vala.Parser wrapper
+ * Vala.Parser wrapper.
+ * Parses different kinds of code islands: class members, expressions as values of properties, statements as values of signals
  */
 public class Gtkaml.ValaParser {
 	
@@ -77,10 +77,7 @@ public class Gtkaml.ValaParser {
 			DirUtils.create_with_parents (".gtkaml", 488 /*0750*/);
 			FileUtils.set_contents (filename, source);
 			var temp_source_file = new SourceFile (ctx, SourceFileType.SOURCE, filename, source);
-/*			
-			foreach (var package in real_context.get_packages ())
-				ctx.add_package (package);
-*/				
+
 			//TODO: use source_reference.using_directives instead of original_source's..?
 			foreach (var using_directive in original_source.current_using_directives) {
 				temp_source_file.add_using_directive (using_directive);

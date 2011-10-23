@@ -32,13 +32,24 @@ class Gtkaml.MarkupScanner {
 	Doc* whole_doc;
 
 	public MarkupScanner (SourceFile source_file) throws ParseError {
-		this.whole_doc = null;
 		this.source_file = source_file;
 		
 		this.whole_doc = Xml.Parser.read_file (source_file.filename, null, ParserOption.NOWARNING);
 		if (whole_doc == null) 
 			throw new ParseError.SYNTAX("Error parsing %s".printf (source_file.filename));
 		
+		node = whole_doc->get_root_element ();
+		
+		parse_gtkaml_uri ();
+	}
+	
+	public MarkupScanner.from_string (string source, SourceFile original_file) throws ParseError {
+		this.source_file = original_file;
+		
+		this.whole_doc = Xml.Parser.read_doc (source, null, null, ParserOption.NOWARNING);
+		if (whole_doc == null)
+			throw new ParseError.SYNTAX("Error parsing %s".printf (source_file.filename));
+			
 		node = whole_doc->get_root_element ();
 		
 		parse_gtkaml_uri ();

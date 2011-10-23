@@ -1,6 +1,7 @@
 SUBDIRS = \
 	libgtkaml \
 	src \
+	markuphints \
 	tests/gtk2
 
 pkgconfigdir = $(libdir)/pkgconfig

@@ -58,6 +58,7 @@ gtkaml-1.0.pc
 src/Makefile
 libgtkaml/Makefile
 libgtkaml/gtkaml-1.0.deps
+markuphints/Makefile
 tests/gtk2/Makefile
 ])
 

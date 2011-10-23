@@ -14,9 +14,9 @@ public class Gtkaml.MarkupHintsStore {
 	}
 
 	public void parse () {
-		foreach (var source_file in context.get_source_files ()) {
-			if (source_file.file_type == SourceFileType.PACKAGE) {
-				var filename = source_file.filename.replace (".vapi", ".markuphints");
+		foreach (var pkg in context.get_packages ()) {
+			var filename = context.get_markuphints_path (pkg);
+			if (filename != null) {
 				#if DEBUGMARKUPHINTS
 				stderr.printf ("checking if '%s' file exists.. ", filename);
 				#endif

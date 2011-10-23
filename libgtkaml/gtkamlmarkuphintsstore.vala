@@ -14,7 +14,6 @@ public class Gtkaml.MarkupHintsStore {
 	}
 
 	public void parse () {
-		//TODO: use our own folder?
 		foreach (var source_file in context.get_source_files ()) {
 			if (source_file.file_type == SourceFileType.PACKAGE) {
 				var filename = source_file.filename.replace (".vapi", ".markuphints");

@@ -23,7 +23,6 @@ public class Gtkaml.Ast.MarkupRoot : MarkupTag {
 		generate_creation_method (resolver);
 	}
 
-	//TODO: is this still necessary? maybe we should allow more candidates here too
 	/**
 	 * returns the list of possible creation methods, in root's case, only the default creation method
 	 */

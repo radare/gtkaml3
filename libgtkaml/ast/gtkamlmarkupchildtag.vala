@@ -178,7 +178,6 @@ public abstract class Gtkaml.Ast.MarkupChildTag : MarkupTag {
 		
 		var initializer = new ObjectCreationExpression (creation_method_access, source_reference);
 		
-		//TODO: determine the initialize to call from MarkupHintsStore
 		foreach (var parameter in creation_parameters) {
 			initializer.add_argument (parameter.get_expression (resolver, this));
 		}

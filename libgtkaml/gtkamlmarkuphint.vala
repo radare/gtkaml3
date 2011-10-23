@@ -11,9 +11,6 @@ public class Gtkaml.MarkupHint {
 	 */
 	public string target;
 	
-	/** the target class/interface after resolving */
-	//public TypeSymbol symbol; //TODO use this
-	
 	private static string ADD = "add-"; //composition methods
 	private static string NEW = "new-"; //creation methods
 	

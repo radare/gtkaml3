@@ -76,7 +76,6 @@ public class Gtkaml.Ast.MarkupAttribute {
 			var connect_call = new MethodCall ( new MemberAccess (attribute_access, "connect", source_reference), source_reference);
 			connect_call.add_argument (right_hand);
 			assignment = connect_call;
-			//assignment = new Assignment (attribute_access, get_expression (resolver, markup_tag), AssignmentOperator.ADD, source_reference);
 		} else {
 			assignment = new Assignment (attribute_access, right_hand, AssignmentOperator.SIMPLE, source_reference);
 		}
@@ -97,7 +96,7 @@ public class Gtkaml.Ast.MarkupAttribute {
 		} else if (resolved_attribute is Vala.Signal) {
 			@signal = (Vala.Signal)resolved_attribute;
 		} else {
-			//TODO: it's a parameter for add/create .. maybe
+			//it's a parameter for add/create, not an actual property
 		}
 	}
 	

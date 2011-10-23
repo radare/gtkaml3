@@ -25,7 +25,7 @@ public class Gtkaml.MarkupParser : CodeVisitor, CodeParserProvider {
 
 	public void parse (CodeContext context) {
 		this.context = context;
-		this.code_parser = new ValaParser (context); //TODO move this per class or per source file
+		this.code_parser = new ValaParser (context);
 		context.accept (this);
 	}
 	
@@ -97,7 +97,7 @@ public class Gtkaml.MarkupParser : CodeVisitor, CodeParserProvider {
 	}
 	
 	string parse_identifier (string identifier) throws ParseError {
-		//TODO return UnresolvedSymbol and split by .name.spa.ce?
+		//TODO some sanity checks like a-zA-Z_0-9?
 		return identifier;
 	}
 	
@@ -174,7 +174,7 @@ public class Gtkaml.MarkupParser : CodeVisitor, CodeParserProvider {
 		for (Xml.Node* node = scanner.node->children; node != null; node = node->next)
 		{
 			if (node->type != ElementType.CDATA_SECTION_NODE && node->type != ElementType.TEXT_NODE) 
-				continue;//TODO break?
+				continue;
 			if (strip_simple_text && node->type == ElementType.TEXT_NODE) {
 				text += node->content.strip ();
 			} else {

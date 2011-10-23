@@ -1,0 +1,11 @@
+Changes since gtkaml 0.4:
+- rewritten to directly generate vala AST nodes
+- *.implicits files renamed to *.markuphints
+
+Features:
+- the order of the compiled files doesn't count anymore 
+(gtkaml files correctly expose public symbols at parse time, then figure out the privates at resolve time)
+- custom creation methods (even with parameters) are allowed, the construct {} is still generated
+- 
+
+

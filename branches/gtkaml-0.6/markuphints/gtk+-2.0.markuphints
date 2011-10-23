@@ -12,15 +12,14 @@
 ##   add.add_method_1=param1[=value];param2=[value]
 ##
 ## Given a specific container X, the order of picking a method is
-## - the implicits files in --implicitsdir come first, in the order the dirs 
-##   were specified, then comes the installed ${PREFIX}/share/gtkaml/*.implicits  
+## - the markuphints files in --vapidirs come first, in the order the dirs 
+##   were specified, then comes the installed ${PREFIX}/share/gtkaml/*.markuphints 
 ## - then the methods listed under the [X] group, in the order they are listed
 ## - then the methods listed under [Y] where X extends Y. 
 ##   (repeated for the whole class hierarchy)
 ##
-## You can have your own NS.implicits file, where NS is a Vala namespace
-## You specify an aditional folder for gtkamlc too look in with --implicitsdir
-## And the files configuring the same namespace NS have their definitions merged
+## You can have your own PKG.markuphints file, where PKG is a Vala vapi or gir file
+## You specify an aditional folder for gtkamlc too look in with --vapidir
 
 [Gtk.Label]
 ## rename the parameter 'str' to 'label'
@@ -33,13 +32,12 @@ new.with_label = label
 new.with_mnemonic = label
 
 [Gtk.Container]
-## see issue #7 - we can't use add () for the moment because its a signal
 adds=add
 
 [Gtk.ScrolledWindow]
-## actually add_with_properties reffers to Container.add_with_properties
+## actually add reffers to Container.add
 ## Here we just make it the first to pick by default
-adds = add_with_properties;add_with_viewport
+adds = add;add_with_viewport
 new = hadjustment={null};vadjustment={null}
 
 [Gtk.Box]

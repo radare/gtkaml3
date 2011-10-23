@@ -302,7 +302,7 @@ class Gtkaml.Compiler {
 		bool has_c_files = false;
 
 		foreach (string source in sources) {
-			if (context.add_source_filename (source, run_output || source.has_suffix (".gtkaml"))) {
+			if (context.add_source_filename (source, run_output || source.has_suffix (".gtkaml") || source.has_suffix (".gtkon"))) {
 				if (source.has_suffix (".c")) {
 					has_c_files = true;
 				}

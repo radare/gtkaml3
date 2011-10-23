@@ -53,7 +53,18 @@ public class Gtkaml.MarkupParser : CodeVisitor, CodeParserProvider {
 	public override void visit_source_file (SourceFile source_file) {
 		if (source_file.filename.has_suffix (".gtkaml")) {
 			parse_file (source_file);
-		}
+		} 
+		if (source_file.filename.has_suffix (".gtkon")) {
+			var gtkaml_filename = source_file.filename.replace (".gtkon", ".gtkaml");
+			var gtkon_parser = new GtkonParser ();
+			gtkon_parser.parse_file (source_file.filename);
+			if (FileUtils.test (gtkaml_filename, FileTest.EXISTS))
+				FileUtils.unlink (gtkaml_filename);
+			gtkon_parser.to_file (gtkaml_filename);
+			source_file.filename = gtkaml_filename;
+			message ("parsing %s".printf (source_file.filename));
+			parse_file (source_file);
+		}			
 	}
 
 	public void parse_file (SourceFile source_file) {

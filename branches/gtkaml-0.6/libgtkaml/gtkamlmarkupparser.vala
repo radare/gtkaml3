@@ -62,7 +62,6 @@ public class Gtkaml.MarkupParser : CodeVisitor, CodeParserProvider {
 				FileUtils.unlink (gtkaml_filename);
 			gtkon_parser.to_file (gtkaml_filename);
 			source_file.filename = gtkaml_filename;
-			message ("parsing %s".printf (source_file.filename));
 			parse_file (source_file);
 		}			
 	}

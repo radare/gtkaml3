@@ -36,7 +36,7 @@ private static string poptoken () {
 	return tokens[--tok_idx];
 }
 
-public bool genie_mode = true; //false;
+public bool genie_mode = false;
 public int genie_indent = 1;
 private bool genie_closetag = false;
 public bool nextiscode = false;

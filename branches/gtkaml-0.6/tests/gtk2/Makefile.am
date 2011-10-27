@@ -3,6 +3,8 @@ ALL = basic_container_add_test basic_tag_attribute_test basic_construct_preconst
 
 all: $(ALL)
 
+.gtkaml:
+
 basic_container_add_test : $@.gtkaml
 	$(top_srcdir)/src/gtkamlc $(VALAFLAGS) --pkg gtk+-2.0 $@.gtkaml --dump-tree $@.vala --vapidir ../../markuphints
 

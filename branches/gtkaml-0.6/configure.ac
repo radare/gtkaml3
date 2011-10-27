@@ -6,6 +6,9 @@ AM_MAINTAINER_MODE
 
 AC_PROG_CC
 AC_DISABLE_STATIC
+# If you add the macro AC_PROG_LIBTOOL here, you must run "libtoolize" before "automake", 
+# or you will get an error:
+# required file `./ltmain.sh' not found
 AC_PROG_LIBTOOL
 
 VALA_VERSION=0.14
@@ -64,6 +67,7 @@ libgtkaml/Makefile
 libgtkaml/gtkaml-1.0.deps
 markuphints/Makefile
 tests/gtk2/Makefile
+tests/gtk3/Makefile
 ])
 
 AC_OUTPUT

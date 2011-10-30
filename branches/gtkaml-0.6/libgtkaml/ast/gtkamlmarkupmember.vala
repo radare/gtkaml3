@@ -29,12 +29,14 @@ public class Gtkaml.Ast.MarkupMember : MarkupChildTag {
 
 	protected string member_name { get; private set; }
 	protected SymbolAccessibility access {get; private set;}
+	protected PropertySpec? property_spec {get; private set;}
 
-	public MarkupMember (MarkupTag parent_tag, string tag_name, MarkupNamespace tag_namespace, string member_name, SymbolAccessibility access, SourceReference? source_reference = null)
+	public MarkupMember (MarkupTag parent_tag, string tag_name, MarkupNamespace tag_namespace, string member_name, SymbolAccessibility access, PropertySpec? property_spec, SourceReference? source_reference = null)
 	{
 		base (parent_tag, tag_name, tag_namespace, source_reference);
 		this.member_name = member_name;
 		this.access = access;
+		this.property_spec = property_spec;
 	}
 
 	public override string me { get { return member_name; }}
@@ -51,10 +53,16 @@ public class Gtkaml.Ast.MarkupMember : MarkupChildTag {
 		var variable_type = data_type.copy ();
 		variable_type.value_owned = false;
 		PropertyAccessor getter = new PropertyAccessor (true, false, false, variable_type, null, source_reference);
+
+		if (property_spec != null && property_spec.getter_accessibility != null)
+			getter.access = property_spec.getter_accessibility;
 		
 		variable_type = data_type.copy ();
 		variable_type.value_owned = false;
 		PropertyAccessor setter = new PropertyAccessor (false, true, false, variable_type, null, source_reference);
+
+		if (property_spec != null && property_spec.setter_accessibility != null)
+			setter.access = property_spec.setter_accessibility;
 		
 		variable_type = data_type.copy ();
 		variable_type.value_owned = true;

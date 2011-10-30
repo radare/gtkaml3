@@ -234,6 +234,7 @@ public class Gtkaml.MarkupParser : CodeVisitor, CodeParserProvider {
 		SymbolAccessibility accessibility = SymbolAccessibility.PUBLIC;
 
 		string identifier = parse_markup_subtag_identifier (scanner, ref accessibility);
+		PropertySpec property_spec = parse_markup_subtag_propertyspec (scanner);
 		string reference = parse_markup_subtag_reference (scanner);
 		string type_name = parse_symbol_name (scanner.node->name);
 		var type_namespace = parse_namespace (scanner);
@@ -241,7 +242,7 @@ public class Gtkaml.MarkupParser : CodeVisitor, CodeParserProvider {
 		if (identifier != null) {
 			if (reference != null)
 				throw new ParseError.SYNTAX ("Cannot specify both an existing reference and a new identifier");
-			markup_tag = new MarkupMember (parent_tag, type_name, type_namespace, identifier, accessibility, scanner.get_src ());
+			markup_tag = new MarkupMember (parent_tag, type_name, type_namespace, identifier, accessibility, property_spec, scanner.get_src ());
 		} else if (reference != null) {
 			markup_tag = new MarkupReference (parent_tag, type_name, type_namespace, reference, scanner.get_src ());
 		} else {
@@ -271,6 +272,7 @@ public class Gtkaml.MarkupParser : CodeVisitor, CodeParserProvider {
 				if (identifier != null) 
 					throw new ParseError.SYNTAX ("Cannot specify more than one of: private, protected, internal, public");
 				identifier = parse_identifier (scanner.node->get_ns_prop (identifier_attribute, scanner.gtkaml_uri));
+				//TODO this code relies on the order of the SymbolAccessibility enum
 				accessibility = (SymbolAccessibility)identifier_gtkamlattributes.index_of (identifier_attribute);
 			} 
 		}		
@@ -296,7 +298,50 @@ public class Gtkaml.MarkupParser : CodeVisitor, CodeParserProvider {
 		} else {
 			return null;
 		}
-	}		
+	}
+	
+	/**
+	 * parses strings like "get; private set" and returns two accessibilities (or null, if not accessor not present) for each
+	 */
+	PropertySpec? parse_markup_subtag_propertyspec (MarkupScanner scanner) throws ParseError {
+		PropertySpec result = null;
+		string propertyspec = scanner.node->get_ns_prop ("property", scanner.gtkaml_uri);
+		if (propertyspec != null) {
+			result = new PropertySpec ();
+			string[] specs = propertyspec.strip ().split (";");
+
+			if (specs.length > 2)
+				throw new ParseError.SYNTAX ("Too many statements in property spec %s".printf (propertyspec));
+			
+			for (int i = 0; i < specs.length; i++) {
+				int access = 3; //PUBLIC
+				string[] spec_tokens = specs[i].strip ().split (" ");
+				if (spec_tokens.length > 2)
+					throw new ParseError.SYNTAX ("Too many tokens in %s".printf (specs[i]));
+
+				if (spec_tokens.length == 2) {
+					access = identifier_gtkamlattributes.index_of (spec_tokens[0]);
+					if (access < 0) 
+						throw new ParseError.SYNTAX ("Unknown access %s".printf (spec_tokens[0]));
+				}
+				
+				//'get' or 'set'
+				if (spec_tokens[spec_tokens.length - 1] == "get") {
+					if (result.getter_accessibility != null) 
+						throw new ParseError.SYNTAX ("getter specified two times in %s".printf (propertyspec));
+					result.getter_accessibility = (SymbolAccessibility)access;
+				}
+				else if (spec_tokens[spec_tokens.length - 1] == "set") {
+					if (result.setter_accessibility != null) 
+						throw new ParseError.SYNTAX ("setter specified two times");
+					result.setter_accessibility = (SymbolAccessibility)access;
+				}
+				else
+					throw new ParseError.SYNTAX ("unkown accessor %s".printf (spec_tokens[spec_tokens.length - 1]));
+			}
+		}
+		return result;
+	}
 
 	void parse_gtkaml_tag (MarkupScanner scanner, MarkupTag parent_tag) throws ParseError {
 		switch (scanner.node->name) {
@@ -350,6 +395,7 @@ public class Gtkaml.MarkupParser : CodeVisitor, CodeParserProvider {
 
 		parsed_gtkamlattributes.add ("existing");
 		parsed_gtkamlattributes.add ("standalone");
+		parsed_gtkamlattributes.add ("property");
 
 	}
 		

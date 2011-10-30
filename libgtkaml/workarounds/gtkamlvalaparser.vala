@@ -36,7 +36,8 @@ public class Gtkaml.ValaParser {
 	}
 
 	/**
-	 * parses CDATA code containing class members
+	 * parses CDATA code containing class members. <br/>
+	 * TODO use Vala.Parser.parse_declarations in the future
 	 */
 	public Class parse_members (MarkupClass markup_class, string members_source) throws ParseError  {
 		string class_name = markup_class.name;
@@ -55,7 +56,8 @@ public class Gtkaml.ValaParser {
 	}
 	
 	/**
-	 * parses an attribute value that is coded as an expression
+	 * parses an attribute value that is coded as an expression.<br />
+	 * TODO use Vala.Parser.parse_expression in the future
 	 */
 	public Expression parse_expression (MarkupClass markup_class, string target, string target_member, string expression_source) throws ParseError {
 		string class_name = markup_class.name;
@@ -71,7 +73,8 @@ public class Gtkaml.ValaParser {
 	}
 	
 	/**
-	 * parses a signal value that is coded as an expression
+	 * parses a signal value that is coded as an expression.<br />
+	 * TODO use Vala.Parser.parse_block in the future
 	 */
 	public Block parse_statements (MarkupClass markup_class, string target, string target_member, string statements_source) throws ParseError {
 		string class_name = markup_class.name;
@@ -83,6 +86,29 @@ public class Gtkaml.ValaParser {
 			return temp_lambda.statement_body;
 		} else {
 			throw new ParseError.SYNTAX ("There was an error parsing the code section: statements");
+		}
+	}
+	
+	/**
+	 * parses the getter/setter declaration
+	 * TODO use Vala.Parser.parse_property_declaration in the future
+	 * TODO this is not used, as we don't seem to need body on getters and setters, a simple 
+	 * MarkupParser.parse_markup_subtag_propertyspec is used now
+	 */
+	public Property parse_property_declaration (MarkupClass markup_class, string target, string target_member, string declaration) throws ParseError
+	{
+		string class_name = markup_class.name;
+		var temp_source = "public class %s { %s { %s }}".printf (class_name, target_member, declaration);
+		
+		var temp_ns = parse (markup_class.source_reference.file, temp_source, class_name + "-members");
+		
+		while (temp_ns.get_namespaces ().size > 0)
+			temp_ns = temp_ns.get_namespaces ()[0];
+		
+		if (temp_ns is Namespace && temp_ns.get_classes ().size == 1 && temp_ns.get_classes ().get (0).get_properties().size == 1) {
+			return temp_ns.get_classes ().get (0).get_properties ().get (0);
+		} else {
+			throw new ParseError.SYNTAX ("There was an error parsing the code section: property declaration");
 		}
 	}
 

@@ -68,6 +68,8 @@ public class Gtkaml.MarkupParser : CodeVisitor, CodeParserProvider {
 
 	public void parse_file (SourceFile source_file) {
 		try {
+			context.run_output = false; //TODO hack: prevent Vala.Parser trying to touch gtkaml/gtkon files
+			
 			MarkupScanner scanner = new MarkupScanner(source_file);
 			
 			parse_using_directives (scanner);

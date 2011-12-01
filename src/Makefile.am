@@ -9,6 +9,8 @@ AM_CFLAGS = \
 bin_PROGRAMS = gtkamlc
 
 BUILT_SOURCES = gtkamlc.stamp
+CLEANFILES = gtkamlc.stamp
+
 
 gtkamlc_VALASOURCES = gtkamlcompiler.vala
 
@@ -29,3 +31,5 @@ gtkamlc_LDADD = \
 
 EXTRA_DIST = $(gtkamlc_VALASOURCES)
 
+install-exec-hook:
+	cd $(DESTDIR)$(bindir) && $(LN_S) -f gtkamlc$(EXEEXT) gtkaml$(EXEEXT)

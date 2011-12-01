@@ -314,14 +314,14 @@ class Gtkaml.Compiler {
 			return quit ();
 		}
 		
+ 		var gtkaml_parser = new MarkupParser ();
+ 		gtkaml_parser.parse (context);
+
 		var parser = new Parser ();
 		parser.parse (context);
 
 		var genie_parser = new Genie.Parser ();
 		genie_parser.parse (context);
-
- 		var gtkaml_parser = new MarkupParser ();
- 		gtkaml_parser.parse (context);
 
 		var gir_parser = new GirParser ();
 		gir_parser.parse (context);

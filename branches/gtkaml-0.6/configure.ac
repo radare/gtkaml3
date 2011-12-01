@@ -47,6 +47,9 @@ PKG_CHECK_MODULES(VALA, libvala-$VALA_VERSION)
 AC_SUBST(VALA_CFLAGS)
 AC_SUBST(VALA_LIBS)
 
+AC_ARG_ENABLE(tests, AS_HELP_STRING([--enable-tests], [Enable building of tests]), enable_tests=$enableval, enable_tests=no)
+AM_CONDITIONAL([ENABLE_TESTS], [test x$enable_tests = xyes])
+
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 
 AC_ARG_ENABLE([docs], AS_HELP_STRING([--enable-docs],[use this to generate valadoc]),

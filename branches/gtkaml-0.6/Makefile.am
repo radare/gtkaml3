@@ -11,5 +11,7 @@ SUBDIRS = \
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = gtkaml-1.0.pc
 
+dist_man_MANS = gtkamlc.1
+
 EXTRA_DIST = \
 	gtkaml-1.0.pc.in

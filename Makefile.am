@@ -14,4 +14,8 @@ pkgconfig_DATA = gtkaml-1.0.pc
 dist_man_MANS = gtkamlc.1
 
 EXTRA_DIST = \
-	gtkaml-1.0.pc.in
+	gtkaml-1.0.pc.in\
+	editors/vim/README \
+	editors/vim/gtkaml.vim \
+	editors/vim/gtkon.vim \
+	editors/vim/vala.vim

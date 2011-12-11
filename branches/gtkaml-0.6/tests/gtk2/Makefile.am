@@ -1,5 +1,6 @@
 ALL = basic_container_add_test basic_tag_attribute_test basic_construct_preconstruct_test test1 test3 test4 test6 test7 test8 test9
 
+EXTRA_DIST = $(ALL:.=.gtkaml) WindowController.vala
 
 all: $(ALL)
 

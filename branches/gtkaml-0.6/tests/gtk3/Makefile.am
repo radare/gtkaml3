@@ -1,5 +1,7 @@
 ALL = test4
 
+EXTRA_DIST = $(ALL:.=.gtkaml)
+
 all: $(ALL)
 
 test4.gtkaml:

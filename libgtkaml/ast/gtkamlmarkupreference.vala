@@ -42,7 +42,7 @@ public class Gtkaml.Ast.MarkupReference : MarkupChildTag {
 	}
 	
 	public override MarkupTag? resolve (MarkupResolver resolver) throws ParseError {
-		resolver.visit_data_type (data_type);
+		data_type.accept (resolver);
 		return this;
 	}
 

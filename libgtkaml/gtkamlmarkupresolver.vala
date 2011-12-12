@@ -40,13 +40,6 @@ public class Gtkaml.MarkupResolver : SymbolResolver, CodeParserProvider {
 		this.context = context;
 		base.resolve (context);
 	}
-
-	public override void visit_class (Class cl) {
-		if (cl is MarkupClass) {
-			visit_markup_class (cl as MarkupClass);
-		}
-		base.visit_class (cl);
-	}
 	
 	/**
 	 * executes before base.visit_class, triggers resolving and generating of tags
@@ -169,6 +162,11 @@ public class Gtkaml.MarkupResolver : SymbolResolver, CodeParserProvider {
 	 * returns the list of methods that can be used to add child tags for the current type, and its base types
 	 */
 	public Vala.List<Callable> get_composition_method_candidates (TypeSymbol parent_tag_symbol) {
+		Vala.Set<string> visited = new HashSet<string> (GLib.str_hash, GLib.str_equal);
+		return get_composition_methods_cached (parent_tag_symbol, visited);
+	}
+	
+	protected Vala.List<Callable> get_composition_methods_cached (TypeSymbol parent_tag_symbol, Vala.Set<string> visited) {
 		Vala.List<Callable> candidates = new Vala.ArrayList<Callable> ();
 		#if DEBUGMARKUPHINTS
 		stderr.printf ("Searching for composition method candidates for %s\n", parent_tag_symbol.get_full_name ());
@@ -188,15 +186,23 @@ public class Gtkaml.MarkupResolver : SymbolResolver, CodeParserProvider {
 				}
 			}
 		}
+
 		if (parent_tag_symbol is Class) {
 			Class parent_class = (Class)parent_tag_symbol;
-			if (parent_class.base_class != null)
-				foreach (var m in get_composition_method_candidates (parent_class.base_class))
+			if (parent_class.base_class != null && !visited.contains (parent_class.base_class.get_full_name ())) {
+				foreach (var m in get_composition_methods_cached (parent_class.base_class, visited)) {
 					candidates.add (m);
-			foreach (var base_type in parent_class.get_base_types ())
-				foreach (var m in get_composition_method_candidates (base_type.data_type))
-					candidates.add (m);
+				}
+			}
+			foreach (var base_type in parent_class.get_base_types ()) {
+				if (!visited.contains (base_type.to_qualified_string ())) {
+					foreach (var m in get_composition_methods_cached (base_type.data_type, visited)) {
+						candidates.add (m);
+					}
+				}
+			}
 		} 
+		visited.add (parent_tag_symbol.get_full_name ());
 		return candidates;
 	}
 	

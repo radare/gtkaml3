@@ -68,7 +68,7 @@ public abstract class Gtkaml.Ast.MarkupChildTag : MarkupTag {
 	 */
 	protected void resolve_composition_method (MarkupResolver resolver) throws ParseError {
 		if (standalone) return;
-		var candidates = resolver.get_composition_method_candidates (this.parent_tag.resolved_type.data_type as TypeSymbol);
+		var candidates = resolver.get_composition_method_candidates (this.parent_tag.resolved_type.data_type);
 		
 		//trim the list down to the explicit one, present with value = "true"
 		foreach (var candidate in candidates) {

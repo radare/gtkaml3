@@ -52,9 +52,9 @@ public class Gtkaml.MarkupParser : CodeVisitor, CodeParserProvider {
 	
 	public override void visit_source_file (SourceFile source_file) {
 		if (source_file.filename.has_suffix (".gtkaml")) {
-			parse_file (source_file);
+			parse_markup (source_file);
 		} 
-		if (source_file.filename.has_suffix (".gtkon")) {
+		else if (source_file.filename.has_suffix (".gtkon")) {
 			var gtkaml_filename = source_file.filename.replace (".gtkon", ".gtkaml");
 			var gtkon_parser = new GtkonParser ();
 			gtkon_parser.parse_file (source_file.filename);
@@ -62,18 +62,18 @@ public class Gtkaml.MarkupParser : CodeVisitor, CodeParserProvider {
 				FileUtils.unlink (gtkaml_filename);
 			gtkon_parser.to_file (gtkaml_filename);
 			source_file.filename = gtkaml_filename;
-			parse_file (source_file);
-		}			
+			parse_markup (source_file);
+		}		
 	}
 
-	public void parse_file (SourceFile source_file) {
+	public void parse_markup (SourceFile source_file) {
 		try {
 			context.run_output = false; //TODO hack: prevent Vala.Parser trying to touch gtkaml/gtkon files
 			
 			MarkupScanner scanner = new MarkupScanner(source_file);
 			
-			parse_using_directives (scanner);
-
+			parse_using_directives (scanner, context.root);
+			
 			parse_markup_class (scanner);
 		} catch (ParseError e) {
 			Report.error (null, e.message);
@@ -81,11 +81,13 @@ public class Gtkaml.MarkupParser : CodeVisitor, CodeParserProvider {
 	}
 
 	void parse_markup_class (MarkupScanner scanner) throws ParseError {
-		
-		MarkupNamespace base_ns = parse_namespace (scanner);
-		SymbolAccessibility access = SymbolAccessibility.PUBLIC;
 		string class_name = null;
+		SymbolAccessibility access = SymbolAccessibility.PUBLIC;
 		
+		//parses the prefix of the root node (base class namespace)
+		MarkupNamespace base_ns = parse_namespace (scanner);
+
+		//parsing gtkaml specific attrs on root node
 		foreach (var classname_attribute in classname_gtkamlattributes) {
 			if (scanner.node->get_ns_prop (classname_attribute, scanner.gtkaml_uri) != null)
 			{
@@ -102,7 +104,10 @@ public class Gtkaml.MarkupParser : CodeVisitor, CodeParserProvider {
 		if (class_name == null)
 			throw new ParseError.SYNTAX ("At least the one of the: 'internal', 'public', or 'name' must be specified on the root tag");
 
+		//parses the base class name
 		string base_name = parse_symbol_name (scanner.node->name);
+
+		//adds target class namespace(s) definitions
 		string[] target_ns_names = class_name.split (".");
 		class_name = target_ns_names [target_ns_names.length - 1];
 		Namespace target_namespace = context.root;
@@ -113,13 +118,10 @@ public class Gtkaml.MarkupParser : CodeVisitor, CodeParserProvider {
 			target_namespace = sub_namespace;
 		}
 		
-
 		MarkupClass markup_class = new MarkupClass (base_name, base_ns, class_name, scanner.get_src ());
 
 		markup_class.access = access;
-
 		target_namespace.add_class (markup_class);
-		//scanner.source_file.add_node (markup_class);
 
 		markup_class.markup_root.text = parse_text (scanner);
 		parse_attributes (scanner, markup_class.markup_root);
@@ -138,18 +140,18 @@ public class Gtkaml.MarkupParser : CodeVisitor, CodeParserProvider {
 		return symbol_name.replace ("-", "_");
 	}
 	
-	void parse_using_directives (MarkupScanner scanner) throws ParseError {
+	void parse_using_directives (MarkupScanner scanner, Namespace ns_current) throws ParseError {
 		for (Ns* ns = scanner.node->ns_def; ns != null; ns = ns->next) {
 			if (ns->href != scanner.gtkaml_uri) 
-				parse_using_directive (scanner, ns->href);
+				parse_using_directive (scanner, ns->href, ns_current);
 		}
 	}
 	
-	void parse_using_directive (MarkupScanner scanner, string ns) throws ParseError {
+	void parse_using_directive (MarkupScanner scanner, string ns, Namespace ns_current) throws ParseError {
 		var ns_sym = parse_namespace_symbol (scanner, ns);
 		var ns_ref = new UsingDirective (ns_sym, ns_sym.source_reference);
 		scanner.source_file.add_using_directive (ns_ref);
-		context.root.add_using_directive (ns_ref);
+		ns_current.add_using_directive (ns_ref);
 	}
 
 	MarkupNamespace parse_namespace (MarkupScanner scanner) throws ParseError {

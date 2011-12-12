@@ -44,6 +44,7 @@ class Gtkaml.DataTypeParent : Symbol {
 	
 	public override void replace_type (DataType old_type, DataType new_type) {
 		assert (data_type == old_type);
+		assert (data_type != new_type);
 		data_type = new_type;
 	}
 }

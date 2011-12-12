@@ -37,5 +37,12 @@ public class Gtkaml.MarkupClass : Class {
 		this.markup_root = new MarkupRoot (this, tag_name, tag_namespace, source_reference);
 	}
 	
+	public override void accept_children (CodeVisitor visitor) {
+		if (visitor is MarkupResolver) {
+			((MarkupResolver)visitor).visit_markup_class (this);
+		}
+		base.accept_children (visitor);
+	}	
+	
 }
 

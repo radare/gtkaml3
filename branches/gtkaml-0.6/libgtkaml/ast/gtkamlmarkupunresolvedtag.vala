@@ -89,7 +89,7 @@ public class Gtkaml.Ast.MarkupUnresolvedTag : MarkupChildTag {
 		//this prevents reporting another error
 		((UnresolvedType)data_type).unresolved_symbol.error = true;
 
-		resolver.visit_data_type (data_type);
+		data_type.accept (resolver);
 
 		((UnresolvedType)data_type).unresolved_symbol.error = false;
 	}

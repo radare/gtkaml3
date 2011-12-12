@@ -129,7 +129,8 @@ public abstract class Gtkaml.Ast.MarkupTag : Object {
 	 * Tags to remove must return 'null' here so that the SymbolResolver can remove them later
 	 */
 	public virtual MarkupTag? resolve (MarkupResolver resolver) throws ParseError {
-		resolver.visit_data_type (data_type);
+		data_type.accept (resolver);
+		resolved_type.data_type.accept (resolver);
 		return this;
 	}
 	

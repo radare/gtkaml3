@@ -44,6 +44,13 @@ public class Gtkaml.Ast.MarkupRoot : MarkupTag {
 		generate_creation_method (resolver);
 	}
 
+	public override MarkupTag? resolve (MarkupResolver resolver) throws ParseError {
+		foreach (var using_directive in markup_class.source_reference.using_directives) {
+			using_directive.namespace_symbol.accept (resolver);
+		}
+		return base.resolve (resolver);
+	}
+
 	/**
 	 * returns the list of possible creation methods, in root's case, only the default creation method
 	 */

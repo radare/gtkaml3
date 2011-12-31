@@ -74,5 +74,5 @@ libgtkaml.stamp: $(libgtkaml_la_VALASOURCES)
 	$(VALADOC_COMMAND)
 	touch $@
 
-EXTRA_DIST = $(libgtkaml_la_VALASOURCES) gtkaml-1.0.deps.in
+EXTRA_DIST = $(libgtkaml_la_VALASOURCES) gtkaml-1.0.deps.in config.vapi
 

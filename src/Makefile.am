@@ -23,11 +23,11 @@ gtkamlc.stamp : $(gtkamlc_VALASOURCES)
 	touch $@
 
 gtkamlc_LDADD = \
+	$(top_srcdir)/libgtkaml/libgtkaml.la \
 	$(GLIB_LIBS) \
 	$(GIO_LIBS) \
 	$(VALA_LIBS) \
-	$(LIBXML2_LIBS) \
-	$(top_srcdir)/libgtkaml/libgtkaml.la
+	$(LIBXML2_LIBS)
 
 EXTRA_DIST = $(gtkamlc_VALASOURCES)
 

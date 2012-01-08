@@ -89,7 +89,7 @@ public class Gtkaml.Ast.MarkupRoot : MarkupTag {
 				}
 			}
 		}
-		foreach (var x in temp_class.get_properties ()) { markup_class.add_property (x); };
+		foreach (var x in temp_class.get_properties ()) { x.scope.remove ("this"); markup_class.add_property (x); };
 		foreach (var x in temp_class.get_signals ()) { markup_class.add_signal (x); };
 		foreach (var x in temp_class.get_classes ()) { markup_class.add_class (x); };
 		foreach (var x in temp_class.get_structs ()) { markup_class.add_struct (x); };

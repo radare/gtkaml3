@@ -56,7 +56,7 @@ public class Gtkaml.MarkupResolver : SymbolResolver, CodeParserProvider {
 	/**
 	 * looks up a memeber in the type hierarchy and returns its symbol
 	 */
-	public Symbol? search_symbol (ObjectTypeSymbol type, string sym_name)
+	public Symbol? search_symbol (TypeSymbol type, string sym_name)
 	{
 		Symbol? sym = type.scope.lookup (sym_name);
 		if (sym == null) {
@@ -118,9 +118,9 @@ public class Gtkaml.MarkupResolver : SymbolResolver, CodeParserProvider {
 	public void generate_markup_tag (MarkupTag markup_tag) {
 		markup_tag.generate (this);
 		markup_tag.generate_preconstruct (this);
+		markup_tag.generate_attributes (this);
 		foreach (MarkupTag child_tag in markup_tag.get_child_tags ())
 			generate_markup_tag (child_tag);
-		markup_tag.generate_attributes (this);
 		markup_tag.generate_construct (this);
 	}
 	

@@ -70,15 +70,12 @@ public class Gtkaml.Ast.MarkupUnresolvedTag : MarkupChildTag {
 		assert_not_reached ();//unresolved tags are replaced with temporary variables or complex attributes at resolve () time
 	}
 	
-	private MarkupComplexAttribute mutate_into_complex_attribute (MarkupTag child_tag, MarkupResolver resolver)
+	private MarkupComplexAttribute mutate_into_complex_attribute (MarkupChildTag child_tag, MarkupResolver resolver)
 	{
-		//child_tag.generate_public_ast (resolver);
 		var resolved_child = child_tag.resolve (resolver) as MarkupChildTag;
 
 		resolved_child.standalone = true;
 		resolved_child.resolve_attributes (resolver);
-
-		resolved_child.generate (resolver);
 		
 		return new MarkupComplexAttribute (tag_name, parent_tag, resolved_child, source_reference);
 	}		

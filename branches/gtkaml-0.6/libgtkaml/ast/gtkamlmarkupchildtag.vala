@@ -58,6 +58,15 @@ public abstract class Gtkaml.Ast.MarkupChildTag : MarkupTag {
 		resolve_composition_method (resolver);
 	}
 
+	public override void generate_attributes (MarkupResolver resolver) {
+		foreach (var attribute in composition_parameters) {
+			if (attribute is MarkupComplexAttribute) {
+				resolver.generate_markup_tag (((MarkupComplexAttribute)attribute).value_tag);
+			}
+		}
+		base.generate_attributes (resolver);
+	}
+
 	public override void generate_construct (MarkupResolver resolver) {
 		base.generate_construct (resolver);
 		generate_add (resolver);
@@ -193,11 +202,19 @@ public abstract class Gtkaml.Ast.MarkupChildTag : MarkupTag {
 	 */
 	protected ObjectCreationExpression get_initializer (MarkupResolver resolver) 
 	{
+		bool is_struct = resolved_type is StructValueType;
+		
+		if (is_struct) stderr.printf ("This is struct %s and is created with %s\n", me, creation_method.name);
+		
 		var creation_method_access = get_class_expression ();
-		creation_method_access = new MemberAccess (creation_method_access, creation_method.name, source_reference);
+		
+		if (!is_struct || creation_method.name != ".new") {
+			creation_method_access = new MemberAccess (creation_method_access, creation_method.name, source_reference);
+		}
 		creation_method_access.creation_member = true;
 		
 		var initializer = new ObjectCreationExpression (creation_method_access, source_reference);
+		initializer.struct_creation = is_struct;
 		
 		foreach (var parameter in creation_parameters) {
 			initializer.add_argument (parameter.get_expression (resolver, this));
@@ -207,6 +224,8 @@ public abstract class Gtkaml.Ast.MarkupChildTag : MarkupTag {
 		variable_type.value_owned = true;
 		variable_type.nullable = false;
 		variable_type.is_dynamic = false;
+
+		initializer.target_type = variable_type;
 
 		return initializer;
 	}

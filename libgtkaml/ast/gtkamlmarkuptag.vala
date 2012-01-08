@@ -152,7 +152,13 @@ public abstract class Gtkaml.Ast.MarkupTag : Object {
 	 * Final AST generation phase2 (attributes)
 	 */
 	public virtual void generate_attributes (MarkupResolver resolver)	{
-		
+
+		foreach (var attribute in creation_parameters) {
+			if (attribute is MarkupComplexAttribute) {
+				resolver.generate_markup_tag (((MarkupComplexAttribute)attribute).value_tag);
+			}
+		}
+
 		foreach (var attribute in markup_attributes) {
 			if (attribute is MarkupComplexAttribute) {
 				resolver.generate_markup_tag (((MarkupComplexAttribute)attribute).value_tag);
@@ -270,12 +276,21 @@ public abstract class Gtkaml.Ast.MarkupTag : Object {
 	 * returns the list of possible creation methods
 	 */
 	protected virtual Vala.List<CreationMethod> get_creation_method_candidates () {
-		assert (resolved_type.data_type is Class);
 		#if DEBUGMARKUPHINTS
 		stderr.printf ("Searching for creation method candidates for %s:\n", resolved_type.data_type.get_full_name ()); 
 		#endif
 		Vala.List<CreationMethod> candidates = new Vala.ArrayList<CreationMethod> ();
-		foreach (Method m in (resolved_type.data_type as Class).get_methods ()) {
+
+		Vala.List<Method> methods = null;
+		if (resolved_type.data_type is Class) {
+			methods = ((Class)resolved_type.data_type).get_methods ();
+		} else if (resolved_type.data_type is Struct) {
+			methods = ((Struct)resolved_type.data_type).get_methods ();
+			var default_struct_creation = new CreationMethod (tag_name, ".new", source_reference);
+			methods.add (default_struct_creation);
+		}
+			
+		foreach (Method m in methods) {
 			if (m is CreationMethod) { 
 				candidates.add (m as CreationMethod);
 				#if DEBUGMARKUPHINTS

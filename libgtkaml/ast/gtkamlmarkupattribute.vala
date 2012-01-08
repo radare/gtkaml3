@@ -105,10 +105,16 @@ public class Gtkaml.Ast.MarkupAttribute {
 	
 	public virtual void resolve (MarkupResolver resolver, MarkupTag markup_tag) {
 
-		assert (markup_tag.resolved_type is ObjectType);
-		var cl = ((ObjectType)markup_tag.resolved_type).type_symbol;
+		assert (markup_tag.resolved_type is ObjectType || markup_tag.resolved_type is StructValueType);
 		
-		Symbol? resolved_attribute = resolver.search_symbol (cl, attribute_name);
+		TypeSymbol type_symbol = null;
+		if (markup_tag.resolved_type is ObjectType) {
+			type_symbol = ((ObjectType)markup_tag.resolved_type).type_symbol;
+		} else if (markup_tag.resolved_type is StructValueType) {
+			type_symbol = ((StructValueType)markup_tag.resolved_type).type_symbol;
+		}
+		
+		Symbol? resolved_attribute = resolver.search_symbol (type_symbol, attribute_name);
 		
 		if (resolved_attribute is Property) {
 			target_type = ((Property)resolved_attribute).property_type.copy ();
@@ -129,9 +135,9 @@ public class Gtkaml.Ast.MarkupAttribute {
 		} else if (type_name == "bool") {
 			//TODO: full boolean check 
 			return new BooleanLiteral (attribute_value == "true", source_reference);
-		} else if (type_name == "int" || type_name == "uint") {
+		} else if (target_type is IntegerType) {
 			return new IntegerLiteral (attribute_value, source_reference);
-		} else if (type_name == "double" || type_name == "float") {
+		} else if (target_type is FloatingType) {
 			return new RealLiteral (attribute_value, source_reference);
 		} else if (target_type is ReferenceType && stripped_value == "null") {
 			return new NullLiteral (source_reference);

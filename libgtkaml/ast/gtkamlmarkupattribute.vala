@@ -48,7 +48,7 @@ public class Gtkaml.Ast.MarkupAttribute {
 		this.source_reference = source_reference;
 	}
 	
-	public virtual Expression? get_expression (MarkupResolver resolver, MarkupTag markup_tag) throws ParseError {
+	public virtual Expression? get_expression (MarkupResolver resolver, MarkupTag markup_tag) {
 		resolve (resolver, markup_tag);
 		
 		string stripped_value = attribute_value.strip ();
@@ -81,7 +81,7 @@ public class Gtkaml.Ast.MarkupAttribute {
 		return null;
 	}
 
-	public virtual Statement? get_assignment (MarkupResolver resolver, MarkupTag markup_tag) throws ParseError {
+	public virtual Statement? get_assignment (MarkupResolver resolver, MarkupTag markup_tag) {
 		resolve (resolver, markup_tag);
 
 		Expression assignment;
@@ -103,7 +103,7 @@ public class Gtkaml.Ast.MarkupAttribute {
 		return new ExpressionStatement (assignment);
 	}
 	
-	public virtual void resolve (MarkupResolver resolver, MarkupTag markup_tag) throws ParseError {
+	public virtual void resolve (MarkupResolver resolver, MarkupTag markup_tag) {
 
 		assert (markup_tag.resolved_type is ObjectType);
 		var cl = ((ObjectType)markup_tag.resolved_type).type_symbol;

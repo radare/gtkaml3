@@ -34,7 +34,7 @@ public class Gtkaml.Ast.MarkupComplexAttribute : MarkupAttribute {
 		this.value_tag = value_tag;
 	}
 
-	public override Expression? get_expression (MarkupResolver resolver, MarkupTag markup_tag) throws ParseError {
+	public override Expression? get_expression (MarkupResolver resolver, MarkupTag markup_tag) {
 		resolve (resolver, markup_tag);
 		
 		if (@signal != null) {

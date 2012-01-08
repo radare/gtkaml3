@@ -33,18 +33,18 @@ public class Gtkaml.Ast.MarkupRoot : MarkupTag {
 	
 	public override string me { get { return "this"; } }
 
-	public override void generate_public_ast (CodeParserProvider parser) throws ParseError {
+	public override void generate_public_ast (CodeParserProvider parser) {
 		markup_class.add_base_type (data_type.copy ());
 		markup_class.constructor = new Constructor (markup_class.source_reference);
 		markup_class.constructor.body = new Block (markup_class.source_reference);	
 		parse_class_members (parser, this.text);
 	}
 
-	public override void generate (MarkupResolver resolver) throws ParseError {
+	public override void generate (MarkupResolver resolver) {
 		generate_creation_method (resolver);
 	}
 
-	public override MarkupTag? resolve (MarkupResolver resolver) throws ParseError {
+	public override MarkupTag? resolve (MarkupResolver resolver) {
 		foreach (var using_directive in markup_class.source_reference.using_directives) {
 			using_directive.namespace_symbol.accept (resolver);
 		}
@@ -72,8 +72,10 @@ public class Gtkaml.Ast.MarkupRoot : MarkupTag {
 	}
 
 
-	private void parse_class_members (CodeParserProvider parser, string source) throws ParseError {
+	private void parse_class_members (CodeParserProvider parser, string source) {
 		var temp_class = parser.code_parser.parse_members (markup_class, source);
+		if (!(temp_class is Class)) return;
+		
 		foreach (var x in temp_class.get_constants ()) { markup_class.add_constant (x); };
 		foreach (var x in temp_class.get_fields ()) { markup_class.add_field (x); };
 		foreach (var x in temp_class.get_methods ()) {

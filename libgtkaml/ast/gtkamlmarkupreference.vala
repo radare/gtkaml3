@@ -37,21 +37,21 @@ public class Gtkaml.Ast.MarkupReference : MarkupChildTag {
 
 	public override string me { get { return existing_name; }}
 
-	public override void generate_public_ast (CodeParserProvider parser) throws ParseError {
+	public override void generate_public_ast (CodeParserProvider parser) {
 		//No public AST that ain't there already for references
 	}
 	
-	public override MarkupTag? resolve (MarkupResolver resolver) throws ParseError {
+	public override MarkupTag? resolve (MarkupResolver resolver) {
 		data_type.accept (resolver);
 		return this;
 	}
 
-	public override void resolve_attributes (MarkupResolver resolver) throws ParseError {
+	public override void resolve_attributes (MarkupResolver resolver) {
 		//removed: resolve_creation_method (resolver);
 		resolve_composition_method (resolver);
 	}
 	
-	public override void generate (MarkupResolver resolver) throws ParseError {
+	public override void generate (MarkupResolver resolver) {
 		//removed: generate construct_..() for references
 	}
 }

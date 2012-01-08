@@ -37,15 +37,15 @@ public class Gtkaml.Ast.MarkupTemp : MarkupChildTag {
 		temp_name = ("_" + tag_name + markup_class.get_temp_name ()).replace (".", "_");
 	}
 	
-	public override void generate_public_ast (CodeParserProvider parser) throws ParseError {
+	public override void generate_public_ast (CodeParserProvider parser) {
 		//nothing public about local temps
 	}
 	
-	public override void generate (MarkupResolver resolver) throws ParseError {
+	public override void generate (MarkupResolver resolver) {
 		generate_construct_local (resolver);
 	}
 	
-	private void generate_construct_local(MarkupResolver resolver) throws ParseError {		
+	private void generate_construct_local(MarkupResolver resolver) {		
 		var initializer = get_initializer (resolver);
 		var local_variable = new LocalVariable (null, me,  initializer, source_reference);
 		var local_declaration = new DeclarationStatement (local_variable, source_reference);

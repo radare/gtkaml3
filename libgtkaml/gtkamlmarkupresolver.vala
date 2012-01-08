@@ -83,13 +83,15 @@ public class Gtkaml.MarkupResolver : SymbolResolver, CodeParserProvider {
 	/**
 	 * processes tag hierarchy. Unresolved tags are removed after this step
 	 */
-	protected bool resolve_markup_tag (MarkupTag markup_tag) throws ParseError {
+	protected bool resolve_markup_tag (MarkupTag markup_tag) {
 		//resolve first
 		MarkupTag? resolved_tag = markup_tag.resolve (this);
 		
 		if (resolved_tag != null) {
-			if (resolved_tag.resolved_type.data_type == null) 
-				throw new ParseError.SYNTAX ("Unknown type %s".printf (resolved_tag.tag_name));
+			if (resolved_tag.resolved_type.data_type == null) {
+				Report.error (markup_tag.source_reference, "Unknown type %s".printf (resolved_tag.tag_name));
+				return false;
+			}
 			
 			Vala.List<MarkupChildTag> to_remove = new Vala.ArrayList<MarkupChildTag> ();
 
@@ -113,7 +115,7 @@ public class Gtkaml.MarkupResolver : SymbolResolver, CodeParserProvider {
 	/**
 	 * processes tag hierarchy, calling generate () on each, then recurses, then generate_attributes () 
 	 */
-	public void generate_markup_tag (MarkupTag markup_tag) throws ParseError {
+	public void generate_markup_tag (MarkupTag markup_tag) {
 		markup_tag.generate (this);
 		markup_tag.generate_preconstruct (this);
 		foreach (MarkupTag child_tag in markup_tag.get_child_tags ())

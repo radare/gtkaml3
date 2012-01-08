@@ -35,11 +35,11 @@ public class Gtkaml.Ast.MarkupUnresolvedTag : MarkupChildTag {
 		base (parent_tag, tag_name, tag_namespace, source_reference);
 	}	
 	
-	public override void generate_public_ast (CodeParserProvider parser) throws ParseError {
+	public override void generate_public_ast (CodeParserProvider parser) {
 		//No public AST for unkown stuff
 	}
 	
-	public override MarkupTag? resolve (MarkupResolver resolver) throws ParseError {
+	public override MarkupTag? resolve (MarkupResolver resolver) {
 		//try to silently resolve as a type
 		resolve_silently (resolver);
 
@@ -55,7 +55,8 @@ public class Gtkaml.Ast.MarkupUnresolvedTag : MarkupChildTag {
 						parent_tag.add_markup_attribute (complex_attribute);
 						return null;
 					default:
-						throw new ParseError.SYNTAX ("Don't know how to handle `%s's children".printf (tag_name));
+						Report.error (source_reference, "Don't know how to handle `%s's children".printf (tag_name));
+						return null;
 				}
 			}
 		}
@@ -65,11 +66,11 @@ public class Gtkaml.Ast.MarkupUnresolvedTag : MarkupChildTag {
 		return markup_temp;
 	}
 	
-	public override void generate (MarkupResolver resolver) throws ParseError {
+	public override void generate (MarkupResolver resolver) {
 		assert_not_reached ();//unresolved tags are replaced with temporary variables or complex attributes at resolve () time
 	}
 	
-	private MarkupComplexAttribute mutate_into_complex_attribute (MarkupTag child_tag, MarkupResolver resolver) throws ParseError
+	private MarkupComplexAttribute mutate_into_complex_attribute (MarkupTag child_tag, MarkupResolver resolver)
 	{
 		//child_tag.generate_public_ast (resolver);
 		var resolved_child = child_tag.resolve (resolver) as MarkupChildTag;

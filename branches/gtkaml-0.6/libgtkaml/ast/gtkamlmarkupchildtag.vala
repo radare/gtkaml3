@@ -53,12 +53,12 @@ public abstract class Gtkaml.Ast.MarkupChildTag : MarkupTag {
 		this.parent_tag = parent_tag;
 	}
 
-	public override void resolve_attributes (MarkupResolver resolver) throws ParseError {
+	public override void resolve_attributes (MarkupResolver resolver) {
 		resolve_creation_method (resolver);
 		resolve_composition_method (resolver);
 	}
 
-	public override void generate_construct (MarkupResolver resolver) throws ParseError {
+	public override void generate_construct (MarkupResolver resolver) {
 		base.generate_construct (resolver);
 		generate_add (resolver);
 	}
@@ -66,7 +66,7 @@ public abstract class Gtkaml.Ast.MarkupChildTag : MarkupTag {
 	/**
 	 * determines the composition method to use, setting `composition_method` and `composition_parameters`
 	 */
-	protected void resolve_composition_method (MarkupResolver resolver) throws ParseError {
+	protected void resolve_composition_method (MarkupResolver resolver) {
 		if (standalone) return;
 		var candidates = resolver.get_composition_method_candidates (this.parent_tag.resolved_type.data_type);
 		
@@ -191,7 +191,7 @@ public abstract class Gtkaml.Ast.MarkupChildTag : MarkupTag {
 	/**
 	 * creates the rvalue for the initializer expression
 	 */
-	protected ObjectCreationExpression get_initializer (MarkupResolver resolver) throws ParseError 
+	protected ObjectCreationExpression get_initializer (MarkupResolver resolver) 
 	{
 		var creation_method_access = get_class_expression ();
 		creation_method_access = new MemberAccess (creation_method_access, creation_method.name, source_reference);
@@ -214,7 +214,7 @@ public abstract class Gtkaml.Ast.MarkupChildTag : MarkupTag {
 	/**
 	 * generates the composition method call, unless standalone
 	 */
-	protected void generate_add (MarkupResolver resolver) throws ParseError 
+	protected void generate_add (MarkupResolver resolver) 
 	{
 		if (standalone) return;
 		

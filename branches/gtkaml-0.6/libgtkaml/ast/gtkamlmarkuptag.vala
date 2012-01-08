@@ -121,14 +121,14 @@ public abstract class Gtkaml.Ast.MarkupTag : Object {
 	 * This only generates placeholder Vala AST so that the Parser can move on.
 	 * e.g. the class itself, its public properties go here.
 	 */
-	public abstract void generate_public_ast (CodeParserProvider parser) throws ParseError;
+	public abstract void generate_public_ast (CodeParserProvider parser);
 
 	/**
 	 * Called when Gtkaml is resolving. 
 	 * Here replacements in the Gtkaml AST can be made (e.g. MarkupUnresolvedTag -> MarkupTemp).
 	 * Tags to remove must return 'null' here so that the SymbolResolver can remove them later
 	 */
-	public virtual MarkupTag? resolve (MarkupResolver resolver) throws ParseError {
+	public virtual MarkupTag? resolve (MarkupResolver resolver) {
 		data_type.accept (resolver);
 		resolved_type.data_type.accept (resolver);
 		return this;
@@ -137,7 +137,7 @@ public abstract class Gtkaml.Ast.MarkupTag : Object {
 	/**
 	 * Called when Gtkaml is resolving, after recursing over children
 	 */
-	public virtual void resolve_attributes (MarkupResolver resolver) throws ParseError {
+	public virtual void resolve_attributes (MarkupResolver resolver) {
 		resolve_creation_method (resolver);
 	}
 	
@@ -145,13 +145,13 @@ public abstract class Gtkaml.Ast.MarkupTag : Object {
 	 * Called after Gtkaml finished resolving, before Vala resolver kicks in.
 	 * Final AST generation phase1 (all AST)
 	 */
-	public abstract void generate (MarkupResolver resolver) throws ParseError;
+	public abstract void generate (MarkupResolver resolver);
 	
 	/**
 	 * Called after Gtkaml finished resolving, before Vala resolver kicks in.
 	 * Final AST generation phase2 (attributes)
 	 */
-	public virtual void generate_attributes (MarkupResolver resolver) throws ParseError	{
+	public virtual void generate_attributes (MarkupResolver resolver)	{
 		
 		foreach (var attribute in markup_attributes) {
 			if (attribute is MarkupComplexAttribute) {
@@ -163,22 +163,27 @@ public abstract class Gtkaml.Ast.MarkupTag : Object {
 		}
 	}
 
-	public virtual void generate_preconstruct (MarkupResolver resolver) throws ParseError
+	public virtual void generate_preconstruct (MarkupResolver resolver)
 	{
 		if (preconstruct_text != null) {
 			var stmts = resolver.code_parser.parse_statements (this.markup_class, this.me, "_preconstruct", strip_braces (preconstruct_text));
-			foreach (var stmt in stmts.get_statements ()) {
-				markup_class.constructor.body.add_statement (stmt);
+			if (stmts is Block) {
+				foreach (var stmt in stmts.get_statements ()) {
+					markup_class.constructor.body.add_statement (stmt);
+				}
 			}
 		}
 	}
 
-	public virtual void generate_construct (MarkupResolver resolver) throws ParseError
+	public virtual void generate_construct (MarkupResolver resolver)
 	{
 		if (construct_text != null) {
 			var stmts = resolver.code_parser.parse_statements (this.markup_class, this.me, "_construct", strip_braces (construct_text));
-			foreach (var stmt in stmts.get_statements ())
-				markup_class.constructor.body.add_statement (stmt);
+			if (stmts is Block) {
+				foreach (var stmt in stmts.get_statements ()) {
+					markup_class.constructor.body.add_statement (stmt);
+				}
+			}
 		}
 	}
 
@@ -346,13 +351,14 @@ public abstract class Gtkaml.Ast.MarkupTag : Object {
 		return new MemberAccess (namespace_access (ns.inner), ns.name, source_reference);
 	}
 	
-	private string strip_braces (string code) throws ParseError {
+	private string strip_braces (string code) {
 		string stripped_value = code.strip ();
 		if (stripped_value.has_prefix ("{")) {
 			if (stripped_value.has_suffix ("}")) {
 				return stripped_value.substring (1, stripped_value.length - 2);
 			} else {
-				throw new ParseError.SYNTAX ("Unbalanced braces");
+				Report.error (source_reference, "Unbalanced braces");
+				return code;
 			}
 		} else {
 			return code;

@@ -41,11 +41,11 @@ public class Gtkaml.Ast.MarkupMember : MarkupChildTag {
 
 	public override string me { get { return member_name; }}
 
-	public override void generate_public_ast (CodeParserProvider parser) throws ParseError {
+	public override void generate_public_ast (CodeParserProvider parser) {
 		generate_property ();
 	}
 	
-	public override void generate (MarkupResolver resolver) throws ParseError {
+	public override void generate (MarkupResolver resolver) {
 		generate_construct_member (resolver);
 	}
 	
@@ -77,7 +77,7 @@ public class Gtkaml.Ast.MarkupMember : MarkupChildTag {
 		markup_class.add_property (p);
 	}
 	
-	private void generate_construct_member (MarkupResolver resolver) throws ParseError {
+	private void generate_construct_member (MarkupResolver resolver) {
 		var initializer = get_initializer (resolver);
 		var assignment = new Assignment (new MemberAccess.simple (me, source_reference), initializer, AssignmentOperator.SIMPLE, source_reference);
 		

@@ -39,7 +39,7 @@ public class Gtkaml.ValaParser {
 	 * parses CDATA code containing class members. <br/>
 	 * TODO use Vala.Parser.parse_declarations in the future
 	 */
-	public Class parse_members (MarkupClass markup_class, string members_source) throws ParseError  {
+	public Class? parse_members (MarkupClass markup_class, string members_source) {
 		string class_name = markup_class.name;
 		var temp_source = "public class %s { %s }".printf (class_name, members_source);
 		
@@ -51,7 +51,8 @@ public class Gtkaml.ValaParser {
 		if (temp_ns is Namespace && temp_ns.get_classes ().size == 1) {
 			return temp_ns.get_classes ().get (0);
 		} else {
-			throw new ParseError.SYNTAX ("There was an error parsing the code section: members");
+			Report.error (markup_class.source_reference, "There was an error parsing the code section: members");
+			return null;
 		}
 	}
 	
@@ -59,7 +60,7 @@ public class Gtkaml.ValaParser {
 	 * parses an attribute value that is coded as an expression.<br />
 	 * TODO use Vala.Parser.parse_expression in the future
 	 */
-	public Expression parse_expression (MarkupClass markup_class, string target, string target_member, string expression_source) throws ParseError {
+	public Expression? parse_expression (MarkupClass markup_class, string target, string target_member, string expression_source) {
 		string class_name = markup_class.name;
 		var temp_source = "VoidFunc voidFunc = ()=> %s;".printf (expression_source);
 		
@@ -68,7 +69,8 @@ public class Gtkaml.ValaParser {
 			var temp_lambda = (LambdaExpression)temp_ns.get_fields ().get (0).initializer;
 			return temp_lambda.expression_body;
 		} else {
-			throw new ParseError.SYNTAX ("There was an error parsing the code section: expression");
+			Report.error (markup_class.source_reference, "There was an error parsing the code section: expression");
+			return null;
 		}
 	}
 	
@@ -76,7 +78,7 @@ public class Gtkaml.ValaParser {
 	 * parses a signal value that is coded as an expression.<br />
 	 * TODO use Vala.Parser.parse_block in the future
 	 */
-	public Block parse_statements (MarkupClass markup_class, string target, string target_member, string statements_source) throws ParseError {
+	public Block? parse_statements (MarkupClass markup_class, string target, string target_member, string statements_source) {
 		string class_name = markup_class.name;
 		var temp_source = "VoidFunc voidFunc = ()=> {%s;};".printf (statements_source);
 		
@@ -85,7 +87,8 @@ public class Gtkaml.ValaParser {
 			var temp_lambda = (LambdaExpression)temp_ns.get_fields ().get (0).initializer;
 			return temp_lambda.statement_body;
 		} else {
-			throw new ParseError.SYNTAX ("There was an error parsing the code section: statements");
+			Report.error (markup_class.source_reference, "There was an error parsing the code section: statements");
+			return null;
 		}
 	}
 	
@@ -95,7 +98,7 @@ public class Gtkaml.ValaParser {
 	 * TODO this is not used, as we don't seem to need body on getters and setters, a simple 
 	 * MarkupParser.parse_markup_subtag_propertyspec is used now
 	 */
-	public Property parse_property_declaration (MarkupClass markup_class, string target, string target_member, string declaration) throws ParseError
+	public Property? parse_property_declaration (MarkupClass markup_class, string target, string target_member, string declaration)
 	{
 		string class_name = markup_class.name;
 		var temp_source = "public class %s { %s { %s }}".printf (class_name, target_member, declaration);
@@ -108,7 +111,8 @@ public class Gtkaml.ValaParser {
 		if (temp_ns is Namespace && temp_ns.get_classes ().size == 1 && temp_ns.get_classes ().get (0).get_properties().size == 1) {
 			return temp_ns.get_classes ().get (0).get_properties ().get (0);
 		} else {
-			throw new ParseError.SYNTAX ("There was an error parsing the code section: property declaration");
+			Report.error (markup_class.source_reference, "There was an error parsing the code section: property declaration");
+			return null;
 		}
 	}
 
@@ -116,7 +120,7 @@ public class Gtkaml.ValaParser {
 	 * parses a vala source string temporary stored in .gtkaml/what.vala
 	 * returns the root namespace
 	 */
-	private Namespace parse(SourceFile original_source, string source, string temp_filename) throws ParseError {
+	private Namespace? parse(SourceFile original_source, string source, string temp_filename) {
 		var ctx = new CodeContext ();
 		var filename = ".gtkaml/" + temp_filename + ".vala";
 		
@@ -137,7 +141,8 @@ public class Gtkaml.ValaParser {
 			parser.parse (ctx);
 			return ctx.root;
 		} catch {
-			throw new ParseError.FAILED ("There was an error writing temporary '%s'".printf (filename));
+			Report.error (null, "There was an error writing temporary '%s'".printf (filename));
+			return null;
 		}
 	}
 

@@ -461,8 +461,9 @@ class Gtkaml.Compiler {
 			try {
 				string[] compile_args;
 				Shell.parse_argv ("valac " + args[1], out compile_args);
+				/* TODO: append -D, --pkg, ... flags here */
 
-				var opt_context = new OptionContext ("- Vala");
+				var opt_context = new OptionContext ("- Vala Gtkaml Runtime");
 				opt_context.set_help_enabled (true);
 				opt_context.add_main_entries (options, null);
 				unowned string[] temp_args = compile_args;
@@ -477,6 +478,11 @@ class Gtkaml.Compiler {
 			}
 
 			i++;
+		}
+
+		if (version) {
+			stdout.printf ("Gtkaml %s\n", Config.PACKAGE_VERSION);
+			return 0;
 		}
 
 		if (args[i] == null) {
@@ -555,7 +561,7 @@ class Gtkaml.Compiler {
 		}
 		
 		if (version) {
-			stdout.printf ("Gtkaml %s\n (based on Vala %s)\n", Config.PACKAGE_VERSION, "0.14.x");
+			stdout.printf ("Gtkaml %s\n", Config.PACKAGE_VERSION);
 			return 0;
 		}
 		

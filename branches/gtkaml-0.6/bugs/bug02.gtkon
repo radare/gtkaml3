@@ -1,13 +1,14 @@
-VBox using=Gtk $Bug01 {
+VBox using=Gtk $Bug02 {
 	Label label="cannot compile this";
 	-{
 	/* already defined? */
-	public static void counter { get; set; }
+	//public static void counter { get; set; }
+	public static int counter { get; set; }
 
 	public static void main (string[] args) {
 		Gtk.init (ref args);
 		var w = new Window (WindowType.TOPLEVEL);
-		w.add (new Bug01 ());
+		w.add (new Bug02 ());
 		w.show_all ();
 		Gtk.main ();
 	}

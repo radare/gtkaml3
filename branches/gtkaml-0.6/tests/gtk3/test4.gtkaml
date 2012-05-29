@@ -18,8 +18,8 @@
   <Button label='{"%d".printf(WindowType.TOPLEVEL)}' clicked='{clicked()}'>  </Button>
   <Button label='{"%d".printf(WindowType.TOPLEVEL)}' clicked='{clicked()}'>  </Button>
   <Button label='SHOW' clicked='{pipi.show();}'>  </Button>
-  <VBox gtkaml:private="pipi" can_focus='true' homogeneous='false' spacing='0'>
-    <HBox homogeneous='true' spacing='0'>
+  <Box gtkaml:private="pipi" can_focus='true' homogeneous='false' orientation="{Orientation.HORIZONTAL}">
+    <HBox homogeneous='true'>
       <Label label='One' gtkaml:public='label'>
       </Label>
       <Label label='One &lt;' gtkaml:public='label2'>
@@ -34,9 +34,8 @@
     </HBox>
     <Entry text='pasta' activate='{clicked()}'>    </Entry>
     <Entry text='jiji' activate='{clicked()}'>    </Entry>
-  </VBox>
+  </Box>
   <![CDATA[
-
 		static void clicked () {
 			message("clicked!\n");
 		}   
@@ -51,6 +50,5 @@
 			Gtk.main (); 
 			print ("Username: "+ vb.user.text+"\n");
 		}
-	
   ]]>
 </VBox>

@@ -41,6 +41,7 @@ adds = add;add_with_viewport
 new = hadjustment={null};vadjustment={null}
 
 [Gtk.Box]
+new = orientation={Orientation.VERTICAL};spacing=0
 adds = pack_start;pack_end
 ## defaulting as per pack_start_defaults/pack_end_defaults
 add.pack_start = widget;expand=true;fill=true;padding=0

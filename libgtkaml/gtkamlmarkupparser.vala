@@ -216,7 +216,7 @@ public class Gtkaml.MarkupParser : CodeVisitor, CodeParserProvider {
 				text += node->content;
 			}
 		}
-		return text.chomp ();
+		return text.chomp () + "\n";
 	}
 	
 	void parse_markup_subtags (MarkupScanner scanner, MarkupTag parent_tag) throws ParseError {

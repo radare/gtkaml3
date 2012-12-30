@@ -65,6 +65,7 @@ class Gtkaml.Compiler {
 	static bool deprecated;
 	static bool experimental;
 	static bool experimental_non_null;
+	static bool gobject_tracing;
 	static bool disable_warnings;
 	static string cc_command;
 	[CCode (array_length = false, array_null_terminated = true)]
@@ -125,6 +126,7 @@ class Gtkaml.Compiler {
 		{ "disable-warnings", 0, 0, OptionArg.NONE, ref disable_warnings, "Disable warnings", null },
 		{ "fatal-warnings", 0, 0, OptionArg.NONE, ref fatal_warnings, "Treat warnings as fatal", null },
 		{ "enable-experimental-non-null", 0, 0, OptionArg.NONE, ref experimental_non_null, "Enable experimental enhancements for non-null types", null },
+		{ "enable-gobject-tracing", 0, 0, OptionArg.NONE, ref gobject_tracing, "Enable GObject creation tracing", null },
 		{ "cc", 0, 0, OptionArg.STRING, ref cc_command, "Use COMMAND as C compiler command", "COMMAND" },
 		{ "Xcc", 'X', 0, OptionArg.STRING_ARRAY, ref cc_options, "Pass OPTION to the C compiler", "OPTION..." },
 		{ "dump-tree", 0, 0, OptionArg.FILENAME, ref dump_tree, "Write code tree to FILE", "FILE" },
@@ -175,6 +177,7 @@ class Gtkaml.Compiler {
 		context.deprecated = deprecated;
 		context.experimental = experimental;
 		context.experimental_non_null = experimental_non_null;
+		context.gobject_tracing = gobject_tracing;
 		context.report.enable_warnings = !disable_warnings;
 		context.report.set_verbose_errors (!quiet_mode);
 		context.verbose_mode = verbose_mode;
@@ -208,16 +211,10 @@ class Gtkaml.Compiler {
 		context.thread = thread;
 		context.mem_profiler = mem_profiler;
 		context.save_temps = save_temps;
-		if (profile == "posix") {
-			context.profile = Profile.POSIX;
-			context.add_define ("POSIX");
-		} else if (profile == "gobject-2.0" || profile == "gobject" || profile == null) {
+		if (profile == "gobject-2.0" || profile == "gobject" || profile == null) {
 			// default profile
 			context.profile = Profile.GOBJECT;
 			context.add_define ("GOBJECT");
-		} else if (profile == "dova") {
-			context.profile = Profile.DOVA;
-			context.add_define ("DOVA");
 		} else {
 			Report.error (null, "Unknown profile %s".printf (profile));
 		}
@@ -234,42 +231,30 @@ class Gtkaml.Compiler {
 			}
 		}
 
-		for (int i = 2; i <= 16; i += 2) {
+		for (int i = 2; i <= 18; i += 2) {
 			context.add_define ("VALA_0_%d".printf (i));
 		}
 
-		if (context.profile == Profile.POSIX) {
-			if (!nostdpkg) {
-				/* default package */
-				context.add_external_package ("posix");
-			}
-		} else if (context.profile == Profile.GOBJECT) {
-			int glib_major = 2;
-			int glib_minor = 16;
-			if (target_glib != null && target_glib.scanf ("%d.%d", out glib_major, out glib_minor) != 2) {
-				Report.error (null, "Invalid format for --target-glib");
-			}
+		int glib_major = 2;
+		int glib_minor = 18;
+		if (target_glib != null && target_glib.scanf ("%d.%d", out glib_major, out glib_minor) != 2) {
+			Report.error (null, "Invalid format for --target-glib");
+		}
 
-			context.target_glib_major = glib_major;
-			context.target_glib_minor = glib_minor;
-			if (context.target_glib_major != 2) {
-				Report.error (null, "This version of valac only supports GLib 2");
-			}
+		context.target_glib_major = glib_major;
+		context.target_glib_minor = glib_minor;
+		if (context.target_glib_major != 2) {
+			Report.error (null, "This version of valac only supports GLib 2");
+		}
 
-			for (int i = 16; i <= glib_minor; i += 2) {
-				context.add_define ("GLIB_2_%d".printf (i));
-			}
+		for (int i = 16; i <= glib_minor; i += 2) {
+			context.add_define ("GLIB_2_%d".printf (i));
+		}
 
-			if (!nostdpkg) {
-				/* default packages */
-				context.add_external_package ("glib-2.0");
-				context.add_external_package ("gobject-2.0");
-			}
-		} else if (context.profile == Profile.DOVA) {
-			if (!nostdpkg) {
-				/* default package */
-				context.add_external_package ("dova-core-0.1");
-			}
+		if (!nostdpkg) {
+			/* default packages */
+			context.add_external_package ("glib-2.0");
+			context.add_external_package ("gobject-2.0");
 		}
 
 		if (packages != null) {
@@ -291,18 +276,12 @@ class Gtkaml.Compiler {
 			return quit ();
 		}
 
-		if (context.profile == Profile.GOBJECT) {
-			context.codegen = new GDBusServerModule ();
-		} else if (context.profile == Profile.DOVA) {
-			context.codegen = new DovaErrorModule ();
-		} else {
-			context.codegen = new CCodeDelegateModule ();
-		}
-
+		context.codegen = new GDBusServerModule ();
+		
 		bool has_c_files = false;
 
 		foreach (string source in sources) {
-			if (context.add_source_filename (source, run_output || source.has_suffix (".gtkaml") || source.has_suffix (".gtkon"))) {
+			if (context.add_source_filename (source, run_output || source.has_suffix (".gtkaml") || source.has_suffix (".gtkon"), true)) {
 				if (source.has_suffix (".c")) {
 					has_c_files = true;
 				}
@@ -371,29 +350,27 @@ class Gtkaml.Compiler {
 
 		if (library != null) {
 			if (gir != null) {
-				if (context.profile == Profile.GOBJECT) {
-					long gir_len = gir.length;
-					int last_hyphen = gir.last_index_of_char ('-');
+				long gir_len = gir.length;
+				int last_hyphen = gir.last_index_of_char ('-');
 
-					if (last_hyphen == -1 || !gir.has_suffix (".gir")) {
+				if (last_hyphen == -1 || !gir.has_suffix (".gir")) {
+					Report.error (null, "GIR file name `%s' is not well-formed, expected NAME-VERSION.gir".printf (gir));
+				} else {
+					string gir_namespace = gir.substring (0, last_hyphen);
+					string gir_version = gir.substring (last_hyphen + 1, gir_len - last_hyphen - 5);
+					gir_version.canon ("0123456789.", '?');
+					if (gir_namespace == "" || gir_version == "" || !gir_version[0].isdigit () || gir_version.contains ("?")) {
 						Report.error (null, "GIR file name `%s' is not well-formed, expected NAME-VERSION.gir".printf (gir));
 					} else {
-						string gir_namespace = gir.substring (0, last_hyphen);
-						string gir_version = gir.substring (last_hyphen + 1, gir_len - last_hyphen - 5);
-						gir_version.canon ("0123456789.", '?');
-						if (gir_namespace == "" || gir_version == "" || !gir_version[0].isdigit () || gir_version.contains ("?")) {
-							Report.error (null, "GIR file name `%s' is not well-formed, expected NAME-VERSION.gir".printf (gir));
-						} else {
-							var gir_writer = new GIRWriter ();
+						var gir_writer = new GIRWriter ();
 
-							// put .gir file in current directory unless -d has been explicitly specified
-							string gir_directory = ".";
-							if (directory != null) {
-								gir_directory = context.directory;
-							}
-
-							gir_writer.write_file (context, gir_directory, gir_namespace, gir_version, library);
+						// put .gir file in current directory unless -d has been explicitly specified
+						string gir_directory = ".";
+						if (directory != null) {
+							gir_directory = context.directory;
 						}
+
+						gir_writer.write_file (context, gir_directory, gir_namespace, gir_version, library);
 					}
 				}
 

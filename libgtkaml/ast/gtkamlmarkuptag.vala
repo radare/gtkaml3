@@ -79,6 +79,12 @@ public abstract class Gtkaml.Ast.MarkupTag : Object {
 			return _data_type_parent.data_type;
 		}
 	}
+	
+	public bool is_resolved { 
+		get {
+			return !(_data_type_parent.data_type is UnresolvedType);
+		}
+	}
 
 	public string construct_text;
 	

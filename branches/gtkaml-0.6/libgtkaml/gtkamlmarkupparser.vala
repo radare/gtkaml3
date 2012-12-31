@@ -101,7 +101,7 @@ public class Gtkaml.MarkupParser : CodeVisitor, CodeParserProvider {
 			}
 		}
 		
-		if (class_name == null)
+		if (class_name == null || class_name.length == 0)
 			throw new ParseError.SYNTAX ("At least the one of the: 'internal', 'public', or 'name' must be specified on the root tag");
 
 		//parses the base class name
@@ -216,7 +216,7 @@ public class Gtkaml.MarkupParser : CodeVisitor, CodeParserProvider {
 				text += node->content;
 			}
 		}
-		return text.chomp () + "\n";
+		return text;
 	}
 	
 	void parse_markup_subtags (MarkupScanner scanner, MarkupTag parent_tag) throws ParseError {

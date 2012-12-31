@@ -1,6 +1,7 @@
 0.6 Beta3 Changes
 - prevent a crasher when class name is blank
 - stop stripping CDATA tags' whitespaces
+- copying defines to the context used to parse members
 
 0.6 Beta2 Changes since gtkaml 0.6 beta1
 - non-automatic properties are correctly parsed

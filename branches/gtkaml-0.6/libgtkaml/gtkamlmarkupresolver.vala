@@ -46,8 +46,10 @@ public class Gtkaml.MarkupResolver : SymbolResolver, CodeParserProvider {
 	 */
 	public void visit_markup_class (MarkupClass mcl) {
 		try {
-			resolve_markup_tag (mcl.markup_root);
-			generate_markup_tag (mcl.markup_root);
+			if (!mcl.markup_root.is_resolved) { //break cycles
+				resolve_markup_tag (mcl.markup_root);
+				generate_markup_tag (mcl.markup_root);
+			}
 		} catch (ParseError e) {
 			Report.error (null, e.message);
 		}

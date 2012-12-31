@@ -22,12 +22,15 @@
 using Vala;
 
 /**
- * Hides .check () from Vala.CodeContext with our implementation
+ * Hides some methods from Vala.CodeContext with our implementation
+ * This is useful only if the methods are called from vala/gtkaml compiler driver where
+ * Gtkaml.CodeContext is explicitly used
  */
 public class Gtkaml.CodeContext : Vala.CodeContext {
 
 	public MarkupResolver markup_resolver { get; private set; }
 	public new SymbolResolver resolver { get { return markup_resolver; } } //TODO warning this just hides the SymbolResolver
+	public Set<string> defines = new HashSet<string> (str_hash, str_equal);
 	
 	public CodeContext () {
 		base ();
@@ -48,6 +51,11 @@ public class Gtkaml.CodeContext : Vala.CodeContext {
 		}
 
 		flow_analyzer.analyze (this);
+	}
+	
+	public void add_define (string define) { //TODO warning this just hides the add_define () method
+		defines.add (define);
+		base.add_define (define);
 	}
 	
 	public string get_markuphints_path (string pkg) {

@@ -1,9 +1,13 @@
-Changes since gtkaml 0.6 beta1
+0.6 Beta3 Changes
+- prevent a crasher when class name is blank
+- stop stripping CDATA tags' whitespaces
+
+0.6 Beta2 Changes since gtkaml 0.6 beta1
 - non-automatic properties are correctly parsed
 - struct support
 
 
-Changes since gtkaml 0.4:
+Gtkaml 0.6 changes since gtkaml 0.4:
 - rewritten to directly generate vala AST nodes
 - split into gtkamlc and libgtkaml.so
 - *.implicits files renamed to *.markuphints

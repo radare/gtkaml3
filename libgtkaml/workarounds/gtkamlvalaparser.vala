@@ -28,7 +28,7 @@ using Vala;
  */
 public class Gtkaml.ValaParser {
 	
-	protected CodeContext real_context;
+	protected Gtkaml.CodeContext real_context;
 	protected Vala.List<SourceFile> temp_source_files = new Vala.ArrayList<SourceFile> ();
 	
 	public ValaParser (CodeContext real_context) {
@@ -117,11 +117,24 @@ public class Gtkaml.ValaParser {
 	}
 
 	/**
+	 * Makes a copy of the real context for Vala parser's use
+	 * 
+	 */
+	protected CodeContext copy_context (Gtkaml.CodeContext source) {
+		var ctx = new CodeContext ();
+		foreach (string define in source.defines) {
+			ctx.add_define (define);
+		}
+		
+		return ctx;
+	}
+
+	/**
 	 * parses a vala source string temporary stored in .gtkaml/what.vala
 	 * returns the root namespace
 	 */
 	private Namespace? parse(SourceFile original_source, string source, string temp_filename) {
-		var ctx = new CodeContext ();
+		var ctx = copy_context (real_context);
 		var filename = ".gtkaml/" + temp_filename + ".vala";
 		
 		try {
@@ -146,5 +159,6 @@ public class Gtkaml.ValaParser {
 		}
 	}
 
+	
 
 }

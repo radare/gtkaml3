@@ -61,7 +61,7 @@ public class Gtkaml.Ast.MarkupRoot : MarkupTag {
 			if (assignment != null)
 				markup_class.constructor.body.add_statement (assignment);
 		}
-		
+		base.generate_attributes (resolver);
 	}
 
 	/**

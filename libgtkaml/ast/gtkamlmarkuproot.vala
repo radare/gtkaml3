@@ -43,12 +43,25 @@ public class Gtkaml.Ast.MarkupRoot : MarkupTag {
 	public override void generate (MarkupResolver resolver) {
 		generate_creation_method (resolver);
 	}
-
+	
 	public override MarkupTag? resolve (MarkupResolver resolver) {
 		foreach (var using_directive in markup_class.source_reference.using_directives) {
 			using_directive.namespace_symbol.accept (resolver);
 		}
 		return base.resolve (resolver);
+	}
+
+	public override void generate_attributes (MarkupResolver resolver) {
+		foreach (var parameter in creation_parameters) {
+			if (parameter is MarkupComplexAttribute) {
+				Report.error (source_reference, "Base class parameters cannot be defined as complex attributes: %s.%s".printf (full_name, parameter.attribute_name));
+				break;
+			}
+			var assignment = parameter.get_assignment (resolver, this);
+			if (assignment != null)
+				markup_class.constructor.body.add_statement (assignment);
+		}
+		
 	}
 
 	/**
@@ -111,6 +124,9 @@ public class Gtkaml.Ast.MarkupRoot : MarkupTag {
 		creation_method.access = SymbolAccessibility.PUBLIC;
 		
 		var block = new Block (markup_class.source_reference);
+
+		// In this block, base() call should take place but it's not possible with current Gtk classes
+		// I chose to init the params as fields and put them in construct {} but they may move here
 
 		creation_method.body = block;
 		

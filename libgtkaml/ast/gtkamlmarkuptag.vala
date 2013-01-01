@@ -171,7 +171,7 @@ public abstract class Gtkaml.Ast.MarkupTag : Object {
 			}
 			var assignment = attribute.get_assignment (resolver, this);
 			if (assignment != null)
-				markup_class.constructor.body.add_statement (attribute.get_assignment (resolver, this));
+				markup_class.constructor.body.add_statement (assignment);
 		}
 	}
 

@@ -143,9 +143,17 @@ public class Gtkaml.Ast.MarkupAttribute {
 			return new RealLiteral (attribute_value, source_reference);
 		} else if (target_type is ReferenceType && stripped_value == "null") {
 			return new NullLiteral (source_reference);
+		} else if (target_type is EnumValueType) {
+			var enum_value = ((EnumValueType)target_type).get_member (attribute_value);
+			if (enum_value is Vala.EnumValue) {
+				var enum_access = new MemberAccess.simple(target_type.data_type.name, source_reference);
+				return new MemberAccess (enum_access, enum_value.name, source_reference);
+			} else {
+				Report.error (source_reference, "Error: enum literal of '%s' not found: %s\n".printf (type_name, attribute_value));
+				return null;
+			}
 		} else {
-			//TODO enum here too
-			Report.error (source_reference, "Error: attribute literal of '%s' type found\n".printf (target_type.data_type.get_full_name ()));
+			Report.error (source_reference, "Error: attribute literal of '%s' type found\n".printf (type_name));
 			return null;
 		} 
 	}

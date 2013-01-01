@@ -1,4 +1,4 @@
-ALL = basic_container_add_test basic_tag_attribute_test basic_construct_preconstruct_test test1 test3 test4 test6 test7 test8 test9
+ALL = attribute_literals basic_container_add_test basic_tag_attribute_test basic_construct_preconstruct_test test1 test3 test4 test6 test7 test8 test9
 
 EXTRA_DIST = $(ALL:.=.gtkaml) WindowController.vala
 
@@ -13,6 +13,9 @@ basic_tag_attribute_test : $@.gtkaml
 	$(top_srcdir)/src/gtkamlc $(VALAFLAGS) --pkg gtk+-2.0 $@.gtkaml --dump-tree $@.vala --vapidir ../../markuphints
 
 basic_construct_preconstruct_test : $@.gtkaml
+	$(top_srcdir)/src/gtkamlc $(VALAFLAGS) --pkg gtk+-2.0 $@.gtkaml --dump-tree $@.vala --vapidir ../../markuphints
+	
+attribute_literals : $@.gtkaml
 	$(top_srcdir)/src/gtkamlc $(VALAFLAGS) --pkg gtk+-2.0 $@.gtkaml --dump-tree $@.vala --vapidir ../../markuphints
 
 test1 : $@.gtkaml

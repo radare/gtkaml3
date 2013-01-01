@@ -104,7 +104,8 @@ public class Gtkaml.Ast.MarkupAttribute {
 	}
 	
 	public virtual void resolve (MarkupResolver resolver, MarkupTag markup_tag) {
-
+		if (target_type != null) return;
+	
 		assert (markup_tag.resolved_type is ObjectType || markup_tag.resolved_type is StructValueType);
 		
 		TypeSymbol type_symbol = null;
@@ -130,6 +131,7 @@ public class Gtkaml.Ast.MarkupAttribute {
 	protected Expression? generate_literal (string stripped_value) {
 		assert (target_type != null);
 		var type_name = target_type.data_type.get_full_name ();
+
 		if (type_name == "string") {
 			return new StringLiteral ("\"" + attribute_value.replace ("\"", "\\\"") + "\"", source_reference);
 		} else if (type_name == "bool") {

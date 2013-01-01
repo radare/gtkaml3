@@ -136,7 +136,7 @@ public class Gtkaml.MarkupResolver : SymbolResolver, CodeParserProvider {
 			Vala.List <Pair<string, string?>> parameter_hints = hint.get_creation_method_parameters (m.name);
 			if (parameter_hints == null) parameter_hints = hint.get_composition_method_parameters (m.name); //FIXME this if is disturbing
 			#if DEBUGMARKUPHINTS
-			stderr.printf ("Found %d parameters\n", parameter_hints.size);
+			stderr.printf ("Found %d parameter hints for %s#%s\n", parameter_hints.size, full_type_name, m.name);
 			#endif
 			if (parameter_hints != null && parameter_hints.size != 0) {
 				assert (parameter_hints.size == m.get_parameters ().size);
@@ -159,6 +159,9 @@ public class Gtkaml.MarkupResolver : SymbolResolver, CodeParserProvider {
 			var parameter = new MarkupAttribute.with_type ( formal_parameter.name, null, formal_parameter.variable_type );
 			parameters.add (parameter);
 		}
+		#if DEBUGMARKUPHINTS
+		stderr.printf ("Found %d formal parameters for %s#%s\n", parameters.size, full_type_name, m.name);
+		#endif
 		return parameters;
 	}	
 

@@ -3,7 +3,7 @@ VBox using=Gtk $Bug02 {
 	-{
 	/* already defined? */
 	//public static void counter { get; set; }
-	public static int counter { get; set; }
+	public bool counters { get; set; }
 
 	public static void main (string[] args) {
 		Gtk.init (ref args);

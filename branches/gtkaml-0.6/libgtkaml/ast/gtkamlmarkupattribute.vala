@@ -145,6 +145,11 @@ public class Gtkaml.Ast.MarkupAttribute {
 			return new NullLiteral (source_reference);
 		} else if (target_type is EnumValueType) {
 			var enum_value = ((EnumValueType)target_type).get_member (attribute_value);
+			
+			if (enum_value == null) {
+				 enum_value = ((EnumValueType)target_type).get_member (attribute_value.up ());
+			}
+			
 			if (enum_value is Vala.EnumValue) {
 				var enum_access = new MemberAccess.simple(target_type.data_type.name, source_reference);
 				return new MemberAccess (enum_access, enum_value.name, source_reference);

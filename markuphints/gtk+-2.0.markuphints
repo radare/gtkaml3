@@ -65,7 +65,7 @@ adds = put
 
 [Gtk.Window]
 ## defaulting to toplevel window
-new = type={WindowType.TOPLEVEL}
+new = type=TOPLEVEL
 
 [Gtk.MenuShell]
 adds = append;prepend;insert;

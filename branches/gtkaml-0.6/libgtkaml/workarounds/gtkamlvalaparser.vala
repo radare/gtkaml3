@@ -135,10 +135,10 @@ public class Gtkaml.ValaParser {
 	 */
 	private Namespace? parse(SourceFile original_source, string source, string temp_filename) {
 		var ctx = copy_context (real_context);
-		var filename = ".gtkaml/" + temp_filename + ".vala";
+		var filename = real_context.directory + "/.gtkaml/" + temp_filename + ".vala";
 		
 		try {
-			DirUtils.create_with_parents (".gtkaml", 488 /*0750*/);
+			DirUtils.create_with_parents (real_context.directory + "/.gtkaml", 488 /*0750*/);
 			FileUtils.set_contents (filename, source);
 			var temp_source_file = new SourceFile (ctx, SourceFileType.SOURCE, filename, source);
 

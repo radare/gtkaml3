@@ -89,8 +89,22 @@ public class Gtkaml.Ast.MarkupRoot : MarkupTag {
 		var temp_class = parser.code_parser.parse_members (markup_class, source);
 		if (!(temp_class is Class)) return;
 		
+		Set<string> automatic_fields = new HashSet<string>(str_hash, str_equal);
+		
 		foreach (var x in temp_class.get_constants ()) { markup_class.add_constant (x); };
-		foreach (var x in temp_class.get_fields ()) { markup_class.add_field (x); };
+		
+		foreach (var x in temp_class.get_properties ()) { 
+			x.scope.remove ("this"); 
+			markup_class.add_property (x); 
+			automatic_fields.add("_" + x.name);
+		};
+		
+		foreach (var x in temp_class.get_fields ()) { 
+			if (!automatic_fields.contains (x.name)) {
+				markup_class.add_field (x); 
+			}
+		};
+		
 		foreach (var x in temp_class.get_methods ()) {
 			if (!(x is CreationMethod && ((CreationMethod)x).name == ".new"))  {
 				markup_class.add_method (x);
@@ -102,7 +116,6 @@ public class Gtkaml.Ast.MarkupRoot : MarkupTag {
 				}
 			}
 		}
-		foreach (var x in temp_class.get_properties ()) { x.scope.remove ("this"); markup_class.add_property (x); };
 		foreach (var x in temp_class.get_signals ()) { markup_class.add_signal (x); };
 		foreach (var x in temp_class.get_classes ()) { markup_class.add_class (x); };
 		foreach (var x in temp_class.get_structs ()) { markup_class.add_struct (x); };

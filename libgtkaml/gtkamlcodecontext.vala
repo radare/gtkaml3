@@ -53,7 +53,7 @@ public class Gtkaml.CodeContext : Vala.CodeContext {
 		flow_analyzer.analyze (this);
 	}
 	
-	public void add_define (string define) { //TODO warning this just hides the add_define () method
+	public new void add_define (string define) { //TODO warning this just hides the add_define () method
 		defines.add (define);
 		base.add_define (define);
 	}

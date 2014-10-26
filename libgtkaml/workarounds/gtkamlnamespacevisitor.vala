@@ -25,9 +25,11 @@ using Vala;
 class Gtkaml.NamespaceVisitor : CodeVisitor {
 	private Vala.List<UsingDirective> using_directives = new ArrayList<UsingDirective> ();
 	
+/* UNUSED
 	public Vala.List<UsingDirective> get_using_directives () {
 		return using_directives;
 	}
+*/
 	
 	public override void visit_namespace (Vala.Namespace ns) {
 		ns.accept_children (this);

@@ -45,13 +45,9 @@ public class Gtkaml.MarkupResolver : SymbolResolver, CodeParserProvider {
 	 * executes before base.visit_class, triggers resolving and generating of tags
 	 */
 	public void visit_markup_class (MarkupClass mcl) {
-		try {
-			if (!mcl.markup_root.is_resolved) { //break cycles
-				resolve_markup_tag (mcl.markup_root);
-				generate_markup_tag (mcl.markup_root);
-			}
-		} catch (ParseError e) {
-			Report.error (null, e.message);
+		if (!mcl.markup_root.is_resolved) { //break cycles
+			resolve_markup_tag (mcl.markup_root);
+			generate_markup_tag (mcl.markup_root);
 		}
 	}
 	

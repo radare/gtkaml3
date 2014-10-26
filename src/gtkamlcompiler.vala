@@ -370,7 +370,7 @@ class Gtkaml.Compiler {
 							gir_directory = context.directory;
 						}
 
-						gir_writer.write_file (context, gir_directory, gir_namespace, gir_version, library);
+						gir_writer.write_file (context, gir_directory, gir, gir_namespace, gir_version, library);
 					}
 				}
 

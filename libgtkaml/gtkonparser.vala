@@ -38,7 +38,7 @@ private static string poptoken () {
 
 public bool genie_mode = false;
 public int genie_indent = 1;
-private bool genie_closetag = false;
+//UNUSED private bool genie_closetag = false;
 public bool nextiscode = false;
 
 public int spaces = 0;

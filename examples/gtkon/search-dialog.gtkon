@@ -1,8 +1,15 @@
-Dialog gtkon:version=0.4 using=Gtk gtkaml:name="SearchDialog" title="Find" has-separator=false border-width=5 default-width=350 default-height=100
-  response=on_response destroy=Gtk.main_quit {
+/*
+Window gtkon:version=0.4 using=Gtk title="Search Dialog" destroy=Gtk.main_quit response=on_response destroy=Gtk.main_quit
+	default-width=300 default-height=20 gtkaml:name=SearchDialog {
+*/
+/*
+Dialog using=Gtk gtkaml:name="SearchDialog" title="Find" has-separator=false border-width=5 default-width=350 default-height=100 {
+*/
+Dialog using=Gtk gtkaml:name="SearchDialog" title="Find" border-width=5 default-width=350 default-height=100 {
 	/*Dialog already has a VBox named vbox (existing) and is already added to the Dialog (standalone) */
-	VBox spacing=10 gtkaml:existing=vbox gtkaml:standalone=true {
-		HBox !homogeneous spacing=20 !expand {
+
+	Box orientation=Vertical spacing=10 gtkaml:existing=box content_area gtkaml:standalone=true {
+		Box orientation=Horizontal !homogeneous spacing=20 !expand {
 			Label with-mnemonic label="_Search for:" mnemonic-widget={search_entry} !expand;
 			Entry $.search_entry;
 		}
@@ -17,9 +24,9 @@ Dialog gtkon:version=0.4 using=Gtk gtkaml:name="SearchDialog" title="Find" has-s
 		private Widget find_button;
 
 		public SearchDialog () {
-			add_button (STOCK_HELP, ResponseType.HELP);
-			add_button (STOCK_CLOSE, ResponseType.CLOSE);
-			this.find_button = add_button (STOCK_FIND, ResponseType.APPLY);
+			add_button (Stock.HELP, ResponseType.HELP);
+			add_button (Stock.CLOSE, ResponseType.CLOSE);
+			this.find_button = add_button (Stock.FIND, ResponseType.APPLY);
 			this.find_button.sensitive = false;
 		}
 
